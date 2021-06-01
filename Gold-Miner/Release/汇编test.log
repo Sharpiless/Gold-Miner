@@ -1,0 +1,4 @@
+﻿D:\Microsoft Visual Studio\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(491,5): warning MSB8028: 中间目录(Release\)包含从另一个项目(汇编test.vcxproj)共享的文件。   这会导致错误的清除和重新生成行为。
+  Assembling main.asm...
+include\windows.inc(26889): fatal error A1000: cannot open file : winextra.inc
+D:\Microsoft Visual Studio\MSBuild\Microsoft\VC\v160\BuildCustomizations\masm.targets(70,5): error MSB3721: 命令“ml.exe /c /nologo /Zi /Fo"Release\main.obj" /W3 /errorReport:prompt  /Tamain.asm”已退出，返回代码为 1。

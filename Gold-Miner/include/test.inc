@@ -1,0 +1,1 @@
+testCMP PROTO C
