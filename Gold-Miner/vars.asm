@@ -47,8 +47,12 @@ hookPosY DWORD 0; 钩索位置纵坐标
 public hookPosY
 
 
+; 物体
 
-;TODO 把结构体的定义放在vars中，并将Items设置为public。注意：所有要使用Items的程序，必须对Item结构体再进行一次定义。
+lastHit DWORD ?; 上一次命中的物体。 写：在用户点击鼠标(出勾)时写为-1，在命中物体时设为下标。 读：钩子返回矿工时所加分数为命中物体的价值
+public lastHit
+
+;把结构体Item的定义放在vars中，并将Items设置为public。注意：所有要使用Items的程序，必须对Item结构体再进行一次定义。
 Item STRUCT
 	exist DWORD ?; 1存在，0已不存在（得分）
 	typ DWORD ?; 类别

@@ -27,7 +27,6 @@ calDistance PROTO C :dword, :dword, :dword, :dword  ; 来自StaticLib1.lib
 .data
 
 hookODir DWORD ?; 角速度方向。1朝右，0朝左
-lastHit DWORD ?;
 
 timeElapsed DWORD 0; 记录流逝时间
 

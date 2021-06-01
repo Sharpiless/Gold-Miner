@@ -10,6 +10,7 @@ extern hookV:dword
 extern hookDeg:dword
 extern hookPosX:dword
 extern hookPosY:dword
+extern lastHit:dword
 extern itemNum:dword
 
 
