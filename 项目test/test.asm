@@ -3,10 +3,15 @@
 option casemap:none
 
 includelib msvcrt.lib
+includelib StaticLib1.lib
 include include\utils.inc
+include include\msvcrt.inc
 
 printf PROTO C :ptr dword,:VARARG
 testProc PROTO C
+
+calDistance PROTO C :dword, :dword, :dword, :dword  ; 来自StaticLib1.lib
+
 
 
 .data
@@ -53,12 +58,16 @@ main proc C
 	;测试减法减为负数的情况
 	mov eax, 5;
 	sub eax, 6;
-	.if eax<0; 注意：比较时将eax当作无符号数，因此这样做无法实现判定一个数是否为负。
+	;.if eax < 0;  注意：比较时将eax当作无符号数，因此-1即FFFFFFFF大于0，即逻辑表达式不符合预期功能
+	.if eax != -1; 判断是否等于-1是可以做到的。-1即FFFFFFFF。
 		invoke printf, offset szFmt4, eax
 	.else
 		invoke printf, offset szFmt4, 100
 	.endif
 	;end测试
+
+
+
 
 
 

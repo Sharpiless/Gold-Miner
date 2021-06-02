@@ -97,7 +97,7 @@
       <AdditionalLibraryDirectories>D:\masm32\lib;D:\VisualStudioProjects\Gold-Miner\lib</AdditionalLibraryDirectories>
     </Link>
     <MASM>
-      <IncludePaths>D:\masm32\include;D:\VisualStudioProjects\Gold-Miner\Gold-Miner\include</IncludePaths>
+      <IncludePaths>D:\masm32\include;</IncludePaths>
     </MASM>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

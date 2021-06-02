@@ -1,3 +1,5 @@
+
+
 # 黄金矿工
 
 ## 1.概述
@@ -29,6 +31,8 @@
 ### 物体
 
 `lastHit` 上一次命中的物体的下标。
+
+`itemNum` 物体数量。
 
 写：出勾时设为-1（controller），命中时设为对应下标。
 
@@ -100,17 +104,15 @@ B：
 
 ### 函数：判断钩索是否命中物体
 
-遍历所有物品`item`，判断`hookpos`与物体位置`item.pos`的距离是否小于物体半径`item.radius`。
-
-写的变量：hookDir，hookV，lastHit。
+; @brief: 判断钩索是否命中物体。遍历items中所有物体的位置(posX、posY)，判断钩索位置与物体位置的距离是否小于物体半径。
+; @read: hookPosX，hookPosY，Items
+; @write: lastHit，hookDir，hookV。若命中，写lastHit为命中物体的下标，写hookDir为1，写hookV为f(Items[lastHit].weight)。
 
 ### 函数：判断钩索是否出界
 
-若钩索x坐标>x最大值或y坐标<0或y坐标>y最大值，即钩索出界，`hookDir`由false变为true；
-
-若钩索x坐标<0，即钩索回到矿工手中，`hookStat`由true变为false，加分。
-
-写的变量：hookDir，hootStat。
+; @brief: 判断钩索是否出界或回到矿工手中。
+; @read: hookPosX，hookPosY，lastHit
+; @write: hootDir，hookStat，Items，playerScore。若出界，写hookDir为1；若回到矿工手中，写hookStat为0，写Items[lastHit].exist为0，写playerScore+=Items[lastHit].value
 
 ## 5.视图
 
@@ -118,8 +120,51 @@ B：
 
 ## 6. 可能的问题
 
-1. 由于离散刷新，在刷新间隔长且金子半径小的情况下可能“掠过”物体，即未响应应该响应的isHit。
+1. 由于离散刷新，在刷新间隔长且金子半径小的情况下可能“掠过”物体，即未响应应该响应的isHit。解决方法：在下勾时就根据轨迹直线判断能否命中物体，根据点到直线距离小于半径。问题是需要修改程序框架。
+2. 坐标问题。计算机坐标系$(x,y)$ = 常规坐标系$(-y',x')$。`hookDeg`在常规坐标系上定义，取值范围$[180,360]$。故当调用moovHook改变钩索位置时，移动增量$(Δx,Δy) = (-ρsinθ, ρcosθ)$，其中 $θ$ 即`hookDeg`， $ρ$ 即`hookV`。
 
-   解决方法：在下勾时就根据轨迹直线判断能否命中物体，根据点到直线距离小于半径。问题是需要修改程序框架。
+## 7. C语言库
 
-   
+用C语言处理一些计算，避免汇编中繁琐的浮点数运算。
+
+计算两点间距离：
+
+```
+// 计算两点间距离
+// @params: (x1,y1)第一个点坐标 (x2,y2)第二个点坐标
+// @return: ans,int型距离。
+extern "C" int calDistance(int x1, int y1, int x2, int y2) {
+    int ans = (int)sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+    return ans;
+}
+
+```
+
+计算psinθ：
+
+```
+// 计算ρsinθ
+// @params: theta，角度制，实际取值范围[180, 360]；ρ，极径
+// @return: ans
+extern "C" int calPSin(int deg, int r) {
+    int ans = (int)r*sin(deg * 2 * PI / 360);
+    return ans;
+}
+```
+
+计算pcosθ：
+
+```
+// 计算ρcosθ
+// @params: 同上
+// @return: ans
+extern "C" int calPCos(int deg, int r) {
+    int ans = (int)r*cos(deg * 2 * PI / 360);
+    return ans;
+}
+```
+
+
+
+
+

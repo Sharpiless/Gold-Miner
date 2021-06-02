@@ -26,5 +26,8 @@
     <None Include="include\utils.inc">
       <Filter>头文件</Filter>
     </None>
+    <None Include="include\msvcrt.inc">
+      <Filter>头文件</Filter>
+    </None>
   </ItemGroup>
 </Project>

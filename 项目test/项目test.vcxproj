@@ -93,10 +93,10 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\masm32\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\masm32\lib;D:\VisualStudioProjects\Gold-Miner\lib</AdditionalLibraryDirectories>
     </Link>
     <MASM>
-      <IncludePaths>D:\masm32\include;%(IncludePaths)</IncludePaths>
+      <IncludePaths>D:\masm32\include;</IncludePaths>
     </MASM>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -148,6 +148,7 @@
     <MASM Include="utils.asm" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="include\msvcrt.inc" />
     <None Include="include\utils.inc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -13,7 +13,7 @@ sameMsg sbyte 'the same!', 0ah, 0
 
 .code
 
-;TODO 下面这个函数为什么会死循环，无限重复调用？
+
 testCMP proc C  ; 示例程序：使用CMP比较两个寄存器是否相同
 
 	MOV EAX,1234H;
@@ -27,6 +27,7 @@ LABEL1:
 LABEL2:
 	invoke	printf, offset sameMsg ;
 FINISH:
+	ret
 testCMP endp
 
 end

@@ -10,9 +10,9 @@ curWindow DWORD 0; µ±Ç°ËùÔÚ´°¿Ú¡£0Îª»¶Ó­½çÃæ£¬1ÎªÓÎÏ·½çÃæ£¬2Îª¹ý¹Ø½çÃæ£¬3ÎªÊ§°Ü½
 public curWindow
 
 ; ´°Ìå
-gameX DWORD 0;
+gameX DWORD 0; ÓÐÐ§ÇøÓò¸ß¶È
 public gameX
-gameY DWORD 0;
+gameY DWORD 0; ÓÐÐ§ÇøÓò¿í¶È
 public gameY
 
 ; ÓÎÏ·
@@ -23,7 +23,8 @@ playerScore DWORD 0; µ±Ç°µÃ·Ö
 public playerScore
 
 ; ¹³Ë÷
-; A(Õâ²¿·Ö±äÁ¿ºÃÏñºÍhookODirÒ»Ñù£¬¶¨ÒåÔÚmodelÖÐ¼´¿É¡£ÆäËûÄ£¿é¶¼²»ÐèÒªµ÷ÓÃ)
+; A 
+; £¨A²¿·Ö±äÁ¿ºÃÏñºÍhookODirÒ»Ñù£¬¶¨ÒåÔÚmodelÖÐ¼´¿É¡£ÆäËûÄ£¿é¶¼²»ÐèÒªµ÷ÓÃ£©
 hookStat DWORD ?; ¹³Ë÷×´Ì¬¡£0Ê±²»ÊÍ·Å£¬1Ê±ÊÍ·Å
 public hookStat
 
@@ -37,19 +38,20 @@ hookV DWORD ?; ¹³Ë÷ÏßËÙ¶È£¬ÓÐÒ»»ù´¡Öµ£¬ÃüÖÐ»ØÊÕÊ±ÒÀÀµÓÚ×¥µ½µÄÎïÌåÀàÐÍ
 public hookV
 
 ; B
-hookDeg DWORD 0; ¹³Ë÷½Ç¶È£¬È¡Öµ·¶Î§180~360¶È
+hookDeg DWORD ?; ¹³Ë÷½Ç¶È£¬È¡Öµ·¶Î§180~360¶È
 public hookDeg
 
-hookPosX DWORD 0; ¹³Ë÷Î»ÖÃºá×ø±ê
+hookPosX DWORD ?; ¹³Ë÷Î»ÖÃºá×ø±ê
 public hookPosX
 
-hookPosY DWORD 0; ¹³Ë÷Î»ÖÃ×Ý×ø±ê
+hookPosY DWORD ?; ¹³Ë÷Î»ÖÃ×Ý×ø±ê
 public hookPosY
+
 
 
 ; ÎïÌå
 
-lastHit DWORD ?; ÉÏÒ»´ÎÃüÖÐµÄÎïÌå¡£ Ð´£ºÔÚÓÃ»§µã»÷Êó±ê(³ö¹´)Ê±Ð´Îª-1£¬ÔÚÃüÖÐÎïÌåÊ±ÉèÎªÏÂ±ê¡£ ¶Á£º¹³×Ó·µ»Ø¿ó¹¤Ê±Ëù¼Ó·ÖÊýÎªÃüÖÐÎïÌåµÄ¼ÛÖµ
+lastHit DWORD -1; ÉÏÒ»´ÎÃüÖÐµÄÎïÌå¡£ Ð´£ºÔÚÓÃ»§µã»÷Êó±ê(³ö¹´)Ê±Ð´Îª-1£¬ÔÚÃüÖÐÎïÌåÊ±ÉèÎªÏÂ±ê¡£ ¶Á£º¹³×Ó·µ»Ø¿ó¹¤Ê±Ëù¼Ó·ÖÊýÎªÃüÖÐÎïÌåµÄ¼ÛÖµ
 public lastHit
 
 ;°Ñ½á¹¹ÌåItemµÄ¶¨Òå·ÅÔÚvarsÖÐ£¬²¢½«ItemsÉèÖÃÎªpublic¡£×¢Òâ£ºËùÓÐÒªÊ¹ÓÃItemsµÄ³ÌÐò£¬±ØÐë¶ÔItem½á¹¹ÌåÔÙ½øÐÐÒ»´Î¶¨Òå¡£
