@@ -4,11 +4,12 @@ option casemap:none
 
 includelib msvcrt.lib
 includelib acllib.lib
-include inc\acllib.inc
 include include\test.inc
 include include\vars.inc
 include include\model.inc
 include include\acllib.inc
+
+printf PROTO C :ptr DWORD, :VARARG
 
 .data
 	coord sbyte "%d,%d",10,0

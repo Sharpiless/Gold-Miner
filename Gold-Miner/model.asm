@@ -52,8 +52,6 @@ MoveHookTest proc C
 MoveHookTest endp
 
 
-
-
 ; @brief: 移动钩索。
 ; @read: hookStat，hookODir，hookOmega，hookDir，hookV
 ; @write: hookDeg，hookPosX，hookPosY。若hookStat为0，写hookDeg；反之写hookPosX和hookPosY。
@@ -65,6 +63,23 @@ MoveHook proc C
 ChangePos: ;改变钩索位置
 	;TODO 若lastHit不为-1，需要带着该物体一起移动
 
+	;Step1.hookV送入ebx
+	.if hookDir == 1; 若hookDir为1，对ρ（极径，即hookV）取反
+		mov ebx, 0
+		mov ecx, hookV
+		sub ebx, ecx
+	.else
+		mov ebx, hookV
+	.endif
+
+	;Step2.PSin送入eax,并写hookPosX
+	invoke calPSin, hookDeg, ebx; Δx = -ρsinΘ
+	sub hookPosX, eax
+
+	;Step3.PCos送入eax，并写hookPosY
+	invoke calPCos, hookDeg, ebx; Δy = ρcosΘ
+	add hookPosY, eax
+	
 	jmp FinishMoveHook
 ChangeDeg: ; 改变钩索角度
 	mov eax, hookOmega; 读hookOmega
@@ -106,17 +121,17 @@ MoveHook endp
 ; @write: lastHit，hookDir，hookV。若命中，写lastHit为命中物体的下标，写hookDir为1，写hookV为f(Items[lastHit].weight)。
 IsHit proc C
 	pushad
-	mov edi, 0; 遍历初值
+	mov edi, 0; 初始化遍历变量
 LoopTraverseItem:
 	
 	; 读hookPosX，hookPosY，Items，将计算得到的距离存入eax。
 	invoke calDistance, hookPosX, hookPosY, Items[edi].posX, Items[edi].posY
 	cmp eax, Items[edi].radius;比较大小
-	jb Hit; 距离小于半径，跳转到Hit
+	jb Hit; 距离小于半径，跳转到Hit。相当于break
 	
 	inc edi; 遍历变量++
-	cmp edi, itemNum; 检查遍历是否结束
-	jb LoopTraverseItem
+	cmp edi, itemNum; 检查循环是否结束
+	jb LoopTraverseItem; 循环未结束，进行下一轮循环
 	jmp NotHit; 未命中，跳转到NotHit
 
 Hit:
@@ -207,8 +222,9 @@ IniGameSize:
 	; 初始化钩子变量
 IniHook:
 	; A
-	mov eax, 0; 
-	mov hookStat, eax; 设置hookStat，初始化为0
+	;mov eax, 0; 
+	mov eax, 1;
+	mov hookStat, eax; 设置hookStat，初始化为1(为了测试moveHook)
 	mov eax, 1; 
 	mov hookODir, eax; 设置hookODir，初始化为1
 	mov eax, 0; 
@@ -261,8 +277,8 @@ IniItem:
 	invoke calPCos, 360, 10
 	;end测试
 
-	;测试：手动调用MoveHookTest移动。（成功）
-	invoke MoveHookTest
+	;测试：手动调用MoveHook移动。
+	invoke MoveHook
 	;end测试
 
 	;测试：手动调用isHit和isOut

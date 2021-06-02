@@ -57,7 +57,7 @@ main proc C
 
 	;测试减法减为负数的情况
 	mov eax, 5;
-	sub eax, 6;
+	sub eax, -6;
 	;.if eax < 0;  注意：比较时将eax当作无符号数，因此-1即FFFFFFFF大于0，即逻辑表达式不符合预期功能
 	.if eax != -1; 判断是否等于-1是可以做到的。-1即FFFFFFFF。
 		invoke printf, offset szFmt4, eax
@@ -65,6 +65,13 @@ main proc C
 		invoke printf, offset szFmt4, 100
 	.endif
 	;end测试
+
+	;测试：取反
+	mov ebx, 2;
+	mov eax, 0;
+	sub eax,ebx;
+	;end测试
+
 
 
 

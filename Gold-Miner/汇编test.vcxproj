@@ -97,7 +97,7 @@
       <AdditionalLibraryDirectories>D:\masm32\lib;D:\VisualStudioProjects\Gold-Miner\lib</AdditionalLibraryDirectories>
     </Link>
     <MASM>
-      <IncludePaths>D:\masm32\include;</IncludePaths>
+      <IncludePaths>D:\masm32\include;D:\VisualStudioProjects\Gold-Miner\Gold-Miner\include</IncludePaths>
     </MASM>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -156,12 +156,12 @@
     <MASM Include="vars.asm" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\simple_game-main\src\inc\acllib.inc" />
-    <None Include="..\..\..\simple_game-main\src\inc\msvcrt.inc" />
-    <None Include="..\..\..\simple_game-main\src\inc\windows.inc" />
+    <None Include="include\acllib.inc" />
     <None Include="include\model.inc" />
+    <None Include="include\msvcrt.inc" />
     <None Include="include\test.inc" />
     <None Include="include\vars.inc" />
+    <None Include="include\windows.inc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
