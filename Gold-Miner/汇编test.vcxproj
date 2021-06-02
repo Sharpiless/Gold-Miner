@@ -149,6 +149,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <MASM Include="controller.asm" />
     <MASM Include="main.asm" />
     <MASM Include="model.asm" />
     <MASM Include="test.asm" />

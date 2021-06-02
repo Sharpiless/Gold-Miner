@@ -27,6 +27,9 @@
     <MASM Include="vars.asm">
       <Filter>源文件</Filter>
     </MASM>
+    <MASM Include="controller.asm">
+      <Filter>源文件</Filter>
+    </MASM>
   </ItemGroup>
   <ItemGroup>
     <None Include="include\vars.inc">
