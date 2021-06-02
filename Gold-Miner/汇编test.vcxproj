@@ -149,12 +149,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <MASM Include="controller.asm" />
     <MASM Include="main.asm" />
     <MASM Include="model.asm" />
     <MASM Include="test.asm" />
     <MASM Include="vars.asm" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\simple_game-main\src\inc\acllib.inc" />
+    <None Include="..\..\..\simple_game-main\src\inc\msvcrt.inc" />
+    <None Include="..\..\..\simple_game-main\src\inc\windows.inc" />
     <None Include="include\model.inc" />
     <None Include="include\test.inc" />
     <None Include="include\vars.inc" />

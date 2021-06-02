@@ -21,6 +21,7 @@ printf PROTO C :ptr sbyte, :VARARG
 main proc; 
 		
 	invoke InitGame; 调用initGame
+	invoke registerMouseEvent,iface_mouseEvent ;注册控制流事件
 	invoke cancelTimer, 0 ; 关闭定时器
 	ret
 
