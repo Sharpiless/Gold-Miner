@@ -41,5 +41,14 @@
     <None Include="include\model.inc">
       <Filter>头文件</Filter>
     </None>
+    <None Include="..\..\..\simple_game-main\src\inc\acllib.inc">
+      <Filter>头文件</Filter>
+    </None>
+    <None Include="..\..\..\simple_game-main\src\inc\msvcrt.inc">
+      <Filter>头文件</Filter>
+    </None>
+    <None Include="..\..\..\simple_game-main\src\inc\windows.inc">
+      <Filter>头文件</Filter>
+    </None>
   </ItemGroup>
 </Project>
