@@ -15,7 +15,11 @@ public gameX
 gameY DWORD 0; 有效区域宽度
 public gameY
 
-; 游戏
+; 时间
+restTime DWORD 30
+public restTime
+
+; 得分
 goalScore DWORD 0; 本局游戏的目标得分。
 public goalScore
 
@@ -65,11 +69,24 @@ Item STRUCT
 	value DWORD ?; 价值
 Item ENDS; 一个实例占4*7=28B
 
+Items Item 50 DUP({}); 物体列表(最多有50个物体)
+public Items
+
 itemNum DWORD 10; 物体数量
 public itemNum
 
-Items Item 50 DUP({}); 物体列表(最多有50个物体)
-public Items
+;商店
+tool1 dd 1
+public tool1
+
+tool2 dd 1
+public tool2
+
+tool3 dd 1
+public tool3
+
+tool4 dd 1
+public tool4
 
 end
 

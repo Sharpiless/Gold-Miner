@@ -9,6 +9,7 @@ includelib StaticLib1.lib
 include include\vars.inc
 include include\acllib.inc
 include include\msvcrt.inc
+include include\view.inc
 
 Item STRUCT
 	exist DWORD ?; 1存在，0已不存在（得分）
@@ -29,7 +30,6 @@ calPCos PROTO C :dword, :dword ; 来自StaticLib1.lib，计算PCosθ
 .data
 
 hookODir DWORD ?; 角速度方向。1朝右，0朝左
-
 timeElapsed DWORD 0; 记录流逝时间
 
 szFmt1 BYTE '物体列表中第%d个元素，exist=%d, typ=%d, posX=%d, posY=%d, radius=%d, weight=%d, value=%d', 0ah, 0
@@ -202,7 +202,7 @@ timer proc C id:dword
 	invoke MoveHook; 移动钩索
 	invoke IsHit;
 	invoke IsOut;
-	;TODO invoke绘图函数
+	invoke Flush; 绘图主调函数
 	;invoke printf, OFFSET szFmt2, id, timeElapsed; 打印定时器回调函数信息
 	ret
 timer endp
@@ -251,11 +251,12 @@ IniItem:
 	mov edi, 0; 数组偏移，开始设为0
 	mov eax, 1; 
 	mov Items[edi].exist, eax; 设置第一个物体的exist是1。由于exist字段占四个字节，所以源操作数是eax。
-	mov Items[edi].typ, eax; 设置typ是1
-	mov eax, 40;
-	mov Items[edi].posX, eax; 设置位置为(40,40)
+	mov eax, 0; 
+	mov Items[edi].typ, eax; 设置typ
+	mov eax, 300;
+	mov Items[edi].posX, eax; 设置位置
 	mov Items[edi].posY, eax;
-	mov eax, 15;
+	mov eax, 30;
 	mov Items[edi].radius, eax; 设置半径为15
 	mov eax, 10;
 	mov Items[edi].weight, eax; 设置重量为10
@@ -268,13 +269,6 @@ IniItem:
 	invoke calPSin, 30, 10
 	invoke calPSin, 45, 10
 	invoke calPSin, 60, 10
-	invoke calPSin, 90, 10
-	invoke calPSin, 180, 10
-	invoke calPSin, 360, 10
-	invoke calPCos, 0, 10
-	invoke calPCos, 90, 10
-	invoke calPCos, 180, 10
-	invoke calPCos, 360, 10
 	;end测试
 
 	;测试：手动调用MoveHook移动。

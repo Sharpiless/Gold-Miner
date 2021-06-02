@@ -154,6 +154,7 @@
     <MASM Include="model.asm" />
     <MASM Include="test.asm" />
     <MASM Include="vars.asm" />
+    <MASM Include="view.asm" />
   </ItemGroup>
   <ItemGroup>
     <None Include="include\acllib.inc" />
@@ -161,6 +162,7 @@
     <None Include="include\msvcrt.inc" />
     <None Include="include\test.inc" />
     <None Include="include\vars.inc" />
+    <None Include="include\view.inc" />
     <None Include="include\windows.inc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
