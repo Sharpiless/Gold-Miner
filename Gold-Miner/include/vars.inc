@@ -9,6 +9,9 @@ extern restTime:dword
 ;µÃ·Ö
 extern goalScore:dword
 extern playerScore:dword
+;¿ó¹¤
+extern minerPosX:dword
+extern minerPosY:dword
 ;¹³Ë÷
 extern hookStat:dword
 extern hookDir:dword

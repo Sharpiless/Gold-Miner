@@ -16,7 +16,7 @@ gameY DWORD 0; 有效区域宽度
 public gameY
 
 ; 时间
-restTime DWORD 30
+restTime DWORD ?; 当前关卡剩余时间
 public restTime
 
 ; 得分
@@ -25,6 +25,12 @@ public goalScore
 
 playerScore DWORD 0; 当前得分
 public playerScore
+
+; 矿工
+minerPosX DWORD ?
+public minerPosX
+minerPosY DWORD ?
+public minerPosY
 
 ; 钩索
 ; A 
@@ -52,7 +58,6 @@ hookPosY DWORD ?; 钩索位置纵坐标
 public hookPosY
 
 
-
 ; 物体
 
 lastHit DWORD -1; 上一次命中的物体。 写：在用户点击鼠标(出勾)时写为-1，在命中物体时设为下标。 读：钩子返回矿工时所加分数为命中物体的价值
@@ -72,7 +77,7 @@ Item ENDS; 一个实例占4*7=28B
 Items Item 50 DUP({}); 物体列表(最多有50个物体)
 public Items
 
-itemNum DWORD 10; 物体数量
+itemNum DWORD 1; 物体数量
 public itemNum
 
 ;商店

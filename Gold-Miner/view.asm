@@ -40,6 +40,12 @@ srcstonebook byte "..\resource\icon\stonebook.jpg", 0
 srcseller byte "..\resource\icon\seller.jpg", 0
 srcwords byte "..\resource\icon\words.jpg", 0 
 srcgold byte "..\resource\icon\gold.jpg", 0 
+srcxpx byte "..\resource\icon\xpx.jpg", 0 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+srcdiamond byte "..\resource\icon\diamond.jpg", 0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+srcbigstone byte "..\resource\icon\bigstone.jpg", 0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
 
 imgini ACL_Image <>
 imggame1 ACL_Image <>
@@ -51,6 +57,9 @@ imgstonebook ACL_Image <>
 imgseller ACL_Image <>
 imgwords ACL_Image <>
 imggold ACL_Image <>
+imgxpx ACL_Image <> ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+imgdiamond ACL_Image <>;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+imgbigstone ACL_Image <>;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 
@@ -66,7 +75,8 @@ strScore byte 10 DUP(0)
 strTime byte 10 DUP(0)
 titleScore byte "得 分：", 0
 titleTime byte "时 间：", 0
-
+titleGoal byte "目 标 分 数：", 0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+strGoal byte 10 DUP(0);;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 .code
 
@@ -94,6 +104,7 @@ DrawItem proc C x: dword, y: dword, r: dword, t: dword		;只能在启动了paint时调用
 	mov eax,x
 	mov ebx,r
 	sub eax,ebx
+	add eax,80
 	mov x,eax
 	mov eax,y
 	sub eax,ebx
@@ -105,6 +116,12 @@ DrawItem proc C x: dword, y: dword, r: dword, t: dword		;只能在启动了paint时调用
 	.if eax==0
 		invoke loadImage, offset srcgold, offset imggold
 		invoke putImageScale, offset imggold, y, x, r, r
+	.elseif eax==1	
+		invoke loadImage, offset srcdiamond, offset imgdiamond
+		invoke putImageScale, offset imgdiamond, y, x, r, r
+	.elseif eax==2;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+		invoke loadImage, offset srcbigstone, offset imgbigstone;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+		invoke putImageScale, offset imgbigstone, y, x, r, r;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	.endif
 	pop eax
 	ret
@@ -134,9 +151,10 @@ mainwindow:
 	;pop ebx
 	invoke FlushScore, playerScore
 	invoke FlushTime, restTime
+	invoke myitoa, goalScore, offset strGoal
 	invoke loadImage, offset srcgame1, offset imggame1
 	invoke loadImage, offset srcdigger, offset imgdigger
-
+	invoke loadImage, offset srcxpx, offset imgxpx;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;显示主界面
 	invoke beginPaint
 	invoke putImageScale, offset imggame1, 0, 0, 700, 500	;绘制背景
@@ -147,11 +165,24 @@ mainwindow:
 	mov edi,0
 	mov ebx,itemNum
 	.while edi<ebx
-		invoke DrawItem, Items[edi].posX, Items[edi].posY, Items[edi].radius, Items[edi].typ
+		.if Items[edi].exist == 1  ; TODO yyx加，仅在exist=1时绘制物体
+			invoke DrawItem, Items[edi].posX, Items[edi].posY, Items[edi].radius, Items[edi].typ
+		.endif
 		inc edi
 	.endw
 	pop edi
 	pop ebx
+	;画小螃蟹
+	push ebx;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	push eax;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	mov ebx,hookPosY;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	mov eax,12;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	sub ebx,eax;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	mov eax,hookPosX
+	add eax,80
+	invoke putImageScale, offset imgxpx, ebx, eax, 25, 25	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	pop eax;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	pop ebx;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	invoke setTextSize, 15
 	invoke setTextColor, 00cc9988h
 	invoke setTextBkColor, colorWHITE
@@ -163,19 +194,33 @@ mainwindow:
 	invoke setTextSize, 15
 	invoke setTextColor, 00cc9988h
 	invoke setTextBkColor, colorWHITE
-	invoke paintText, 10, 10, offset titleScore	;显示“得分”
+	invoke paintText, 10, 30, offset titleScore	;显示“得分”
 	invoke setTextSize, 15
 	invoke setTextColor, 00cc9988h
 	invoke setTextBkColor, colorWHITE
-	invoke paintText, 60, 10, offset strScore	;显示分数
+	invoke paintText, 60, 30, offset strScore	;显示分数
 	invoke setTextSize, 15
 	invoke setTextColor, 00cc9988h
 	invoke setTextBkColor, colorWHITE
-	invoke paintText, 10, 30, offset titleTime	;显示"时间"
+	invoke paintText, 10, 10, offset titleTime	;显示"时间"
 	invoke setTextSize, 15
 	invoke setTextColor, 00cc9988h
 	invoke setTextBkColor, colorWHITE
-	invoke paintText, 60, 30, offset strTime	;显示剩余时间
+	invoke paintText, 60, 10, offset strTime	;显示剩余时间
+	push eax
+	mov eax,hookPosX
+	add eax,80
+
+	invoke line, hookPosY, eax, 350, 80;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	pop eax
+	invoke setTextSize, 15;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	invoke setTextColor, 00cc9988h;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	invoke setTextBkColor, colorWHITE;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	invoke paintText, 10, 50, offset titleGoal	;显示"目标分数";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	invoke setTextSize, 15;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	invoke setTextColor, 00cc9988h;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	invoke setTextBkColor, colorWHITE;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	invoke paintText, 110, 50, offset strGoal	;显示目标分数;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	invoke endPaint
 	jmp finish
 
@@ -201,10 +246,12 @@ store:
 	invoke loadImage, offset srcstonebook, offset imgstonebook
 	invoke loadImage, offset srcstrengthwater, offset imgstrengthwater
 	invoke loadImage, offset srcfire, offset imgfire
+	invoke loadImage, offset srcwords, offset imgwords;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;显示主界面
 	invoke beginPaint
 	invoke putImageScale, offset imggame1, 0, 0, 700, 500
 	invoke putImageScale, offset imgseller, 500, 50, 210, 250
+	invoke putImageScale, offset imgwords, 150, 20, 300, 120;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;invoke putImageScale, offset imgwords, 200, 60, 200, 80
 	;以下为显示商品信息
 	push eax

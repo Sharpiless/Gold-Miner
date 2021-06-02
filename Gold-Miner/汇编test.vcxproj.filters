@@ -18,9 +18,6 @@
     <MASM Include="main.asm">
       <Filter>源文件</Filter>
     </MASM>
-    <MASM Include="test.asm">
-      <Filter>源文件</Filter>
-    </MASM>
     <MASM Include="model.asm">
       <Filter>源文件</Filter>
     </MASM>

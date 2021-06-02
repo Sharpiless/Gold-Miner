@@ -114,7 +114,11 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>D:\masm32\lib;D:\VisualStudioProjects\Gold-Miner\lib</AdditionalLibraryDirectories>
     </Link>
+    <MASM>
+      <IncludePaths>D:\masm32\include;D:\VisualStudioProjects\Gold-Miner\Gold-Miner\include</IncludePaths>
+    </MASM>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -152,7 +156,6 @@
     <MASM Include="controller.asm" />
     <MASM Include="main.asm" />
     <MASM Include="model.asm" />
-    <MASM Include="test.asm" />
     <MASM Include="vars.asm" />
     <MASM Include="view.asm" />
   </ItemGroup>

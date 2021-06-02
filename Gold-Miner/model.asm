@@ -30,12 +30,14 @@ calPCos PROTO C :dword, :dword ; 来自StaticLib1.lib，计算PCosθ
 .data
 
 hookODir DWORD ?; 角速度方向。1朝右，0朝左
-timeElapsed DWORD 0; 记录流逝时间
+timeElapsed DWORD ?; 记录流逝时间
 
 szFmt1 BYTE '物体列表中第%d个元素，exist=%d, typ=%d, posX=%d, posY=%d, radius=%d, weight=%d, value=%d', 0ah, 0
 szFmt2 BYTE '%d号计时器响应, 时间已流逝%d ms', 0ah, 0
 szFmt3 BYTE '命中第%d个物体！距离=%d, 物体半径=%d', 0ah, 0
 szFmt4 BYTE '未命中物体！', 0ah, 0
+szFmt5 BYTE '断点...', 0ah, 0
+szFmt6 BYTE 'eax=%d', 0ah, 0
 
 .code
 
@@ -61,8 +63,7 @@ MoveHook proc C
 	cmp hookStat, 0; 读hookStat
 	jz ChangeDeg
 ChangePos: ;改变钩索位置
-	;TODO 若lastHit不为-1，需要带着该物体一起移动
-
+	
 	;Step1.hookV送入ebx
 	.if hookDir == 1; 若hookDir为1，对ρ（极径，即hookV）取反
 		mov ebx, 0
@@ -75,10 +76,18 @@ ChangePos: ;改变钩索位置
 	;Step2.PSin送入eax,并写hookPosX
 	invoke calPSin, hookDeg, ebx; Δx = -ρsinΘ
 	sub hookPosX, eax
+	.if lastHit != -1; 若lastHit不为-1，需要带着该物体一起移动
+		mov edi, lastHit
+		sub Items[edi].posX, eax
+	.endif
 
 	;Step3.PCos送入eax，并写hookPosY
 	invoke calPCos, hookDeg, ebx; Δy = ρcosΘ
 	add hookPosY, eax
+	.if lastHit != -1
+		mov edi, lastHit
+		sub Items[edi].posY, eax
+	.endif
 	
 	jmp FinishMoveHook
 ChangeDeg: ; 改变钩索角度
@@ -142,13 +151,14 @@ Hit:
 	; 写hookDir为1
 	mov eax, 1
 	mov hookDir, eax
-	; hookV = 100-物体重量（f具体表达式待定）
-	mov ebx, 100;
-	sub ebx, Items[edi].weight;
+	; 写hookV = 100-物体重量（f具体表达式待定）
+	;mov ebx, 100;
+	;sub ebx, Items[edi].weight;
+	mov ebx,10; 测试命中后速度为10 TODO 速度设为1好像不动了
 	mov hookV, ebx
 	jmp Finish
 NotHit:
-	invoke printf, OFFSET szFmt4; 打印未命中信息
+	;invoke printf, OFFSET szFmt4; 打印未命中信息
 
 Finish:
 	popad
@@ -157,27 +167,30 @@ IsHit endp
 
 ; @brief: 判断钩索是否出界或回到矿工手中。
 ; @read: hookPosX，hookPosY，lastHit
-; @write: hootDir，hookStat，Items，playerScore。若出界，写hookDir为1；
-; 若回到矿工手中，写hookStat为0，写Items[lastHit].exist为0，写playerScore+=Items[lastHit].value
+; @write: hootDir，hookStat，hookPosX,hookPosY，Items，playerScore。若出界，写hookDir为1；
+; 若回到矿工手中，写hookStat为0，写hookPosX、hookPosY为矿工位置，写Items[lastHit].exist为0，写playerScore+=Items[lastHit].value
 IsOut proc C
 	pushad
 	mov eax, hookPosX; 读hookPosX
 	mov ebx, hookPosY; 读hookPosY
+	
+	;测试:打印hookPosX
+	push eax
+	invoke printf, OFFSET szFmt6, eax
+	pop eax
+	;end测试
 
-	.if eax > gameX; 下出界,写hookDir为1
-		mov eax, 1
-		mov hookDir, eax
-	.elseif ebx < 0; 左出界
-		mov eax, 1
-		mov hookDir, eax
-	.elseif ebx > gameY; 右出界
-		mov eax, 1
-		mov hookDir, eax
-
-	.elseif eax < 0; 钩子回到矿工手中。注意钩索未释放时hookPosX=0，不进入该逻辑。
+	.if eax > 80000000H; 钩子回到矿工手中。注意钩索未释放时hookPosX=0，不进入该逻辑。 <0不达意
+		invoke printf, OFFSET szFmt5; 测试断点
 		; 写hookStat为0
 		mov eax, 0
 		mov hookStat, eax
+		; 写hookPosX、hookPosY为矿工位置
+		mov eax, minerPosX
+		mov hookPosX, eax
+		mov eax, minerPosY
+		mov hookPosY, eax
+		
 		.if lastHit != -1 ; 读lastHit，若不为-1，加分并删除物体
 			; 加分，写playerScore+=Items[lastHit].value
 			mov edi, lastHit
@@ -187,8 +200,16 @@ IsOut proc C
 			mov eax, 0
 			mov Items[edi].exist, eax 
 		.endif
-		
 
+	.elseif eax > gameX; 下出界,写hookDir为1
+		mov eax, 1
+		mov hookDir, eax
+	.elseif ebx > 80000000H; 左出界 <0不达意
+		mov eax, 1
+		mov hookDir, eax
+	.elseif ebx > gameY; 右出界
+		mov eax, 1
+		mov hookDir, eax
 	.endif
 
 	popad
@@ -198,7 +219,8 @@ IsOut endp
 ;@brief:定时器回调函数。每次触发定时器，调用MoveHook移动钩索，并调用IsHit和IsOut
 ;@param:定时器id
 timer proc C id:dword
-	add timeElapsed, 10; 维护流逝的时间
+	add timeElapsed, 20; 维护流逝的时间，单位ms
+	invoke printf, OFFSET szFmt2, id , timeElapsed
 	invoke MoveHook; 移动钩索
 	invoke IsHit;
 	invoke IsOut;
@@ -219,14 +241,35 @@ IniGameSize:
 	mov eax, 700
 	mov gameY, eax; 窗体宽度700
 
+	; 初始化时间
+IniTime:
+	mov eax, 30
+	mov restTime, eax; 剩余时间30s
+
+	; 初始化得分
+IniScore:
+	mov eax, 50
+	mov goalScore, eax; 目标得分
+	mov eax, 0
+	mov playerScore, eax; 当前得分
+
+
+	; 初始化矿工
+IniMiner:
+	mov eax, 0; 
+	mov minerPosX, eax; 设置minerPosX，初始化为0
+	mov eax, gameY; 被除数edx:eax
+	mov ebx, 2; 除数
+	div ebx; 除法的商保存在eax中
+	mov minerPosY, eax; 设置minerPosY，初始化为gameY/2
+
 	; 初始化钩子变量
 IniHook:
 	; A
-	;mov eax, 0; 
 	mov eax, 1;
-	mov hookStat, eax; 设置hookStat，初始化为1(为了测试moveHook)
-	mov eax, 1; 
-	mov hookODir, eax; 设置hookODir，初始化为1
+	mov hookStat, eax; 设置hookStat
+	mov eax, 0; 
+	mov hookODir, eax; 设置hookODir，初始化为0
 	mov eax, 0; 
 	mov hookDir, eax; 设置hookDir, 初始化为0
 	mov eax, 2; 
@@ -235,15 +278,13 @@ IniHook:
 	mov hookV, eax; 设置线速度（默认为10）
 
 	; B
-	mov eax, 180; 
-	mov hookDeg, eax; 设置hookDeg，初始化为180
-	mov eax, 0; 
-	mov hookPosX, eax; 设置hookPosX，初始化为0（即矿工位置x坐标）
+	mov eax, 270; 
+	mov hookDeg, eax; 设置hookDeg
+	mov eax, minerPosX;
+	mov hookPosX, eax; 设置hookPosX（即矿工位置x坐标）
 	mov edx, 0
-	mov eax, gameY; 被除数edx:eax
-	mov ebx, 2; 除数
-	div ebx; 除法的商保存在eax中
-	mov hookPosY, eax; 设置hookPosY，初始化为gameY/2（即矿工位置纵坐标）
+	mov eax, minerPosY;
+	mov hookPosY, eax; 设置hookPosY（即矿工位置y坐标）
 
 
 	;测试：向物体列表中某个元素赋值。实际中替换为随机初始化物体列表。(成功)
@@ -253,7 +294,7 @@ IniItem:
 	mov Items[edi].exist, eax; 设置第一个物体的exist是1。由于exist字段占四个字节，所以源操作数是eax。
 	mov eax, 0; 
 	mov Items[edi].typ, eax; 设置typ
-	mov eax, 300;
+	mov eax, 350;
 	mov Items[edi].posX, eax; 设置位置
 	mov Items[edi].posY, eax;
 	mov eax, 30;
@@ -280,16 +321,17 @@ IniItem:
 	invoke IsOut
 	;end测试
 
-	;测试：注册并启动定时器。（未成功，现在定时器不work）
+	;测试：注册并启动定时器。（成功，当阻塞在main中的init_second时，定时器工作）
 	invoke registerTimerEvent, offset timer  ;注册定时器回调函数timer
 	invoke startTimer, 0, 10  ; 定时器编号为0，刷新间隔为10ms
 	;end测试
 
-	;测试：测试定时器是否work，阻塞在一个空循环中，直到时间流逝1s。
-LoopTest:
-	mov eax, timeElapsed
-	cmp eax, 1000
-	jb LoopTest;
+
+	;测试：阻塞在一个空循环中，直到时间流逝1s。（不成功）
+;LoopTest:
+	;mov eax, timeElapsed
+	;cmp eax, 1000
+	;jb LoopTest;
 	;end测试
 
 	popad
