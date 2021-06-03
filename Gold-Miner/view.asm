@@ -83,6 +83,9 @@ titleTime byte "时 间：", 0
 titleGoal byte "目 标 分 数：", 0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 strGoal byte 10 DUP(0);;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+szFmt1 BYTE '绘制第%d个物体...posX=%d, posY=%d, radius=%d, typ=%d', 0ah, 0
+		
+
 .code
 
 
@@ -102,7 +105,6 @@ FlushTime proc C num: dword
 	pop ebx
 	ret
 FlushTime endp
-
 DrawItem proc C x: dword, y: dword, r: dword, t: dword		;只能在启动了paint时调用此函数
 	push eax
 	push ebx
@@ -170,6 +172,9 @@ mainwindow:
 	mov edi,0
 	mov ebx,itemNum
 	.while edi<ebx
+
+		invoke printf, OFFSET szFmt1, edi, Items[edi].posX, Items[edi].posY, Items[edi].radius, Items[edi].typ; 测试结果
+
 		.if Items[edi].exist == 1  ; yyx加，仅在exist=1时绘制物体
 			invoke DrawItem, Items[edi].posX, Items[edi].posY, Items[edi].radius, Items[edi].typ
 		.endif
