@@ -170,7 +170,7 @@ mainwindow:
 	mov edi,0
 	mov ebx,itemNum
 	.while edi<ebx
-		.if Items[edi].exist == 1  ; TODO yyx加，仅在exist=1时绘制物体
+		.if Items[edi].exist == 1  ; yyx加，仅在exist=1时绘制物体
 			invoke DrawItem, Items[edi].posX, Items[edi].posY, Items[edi].radius, Items[edi].typ
 		.endif
 		inc edi

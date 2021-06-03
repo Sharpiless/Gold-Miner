@@ -1,6 +1,4 @@
 ﻿D:\Microsoft Visual Studio\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(491,5): warning MSB8028: 中间目录(Debug\)包含从另一个项目(汇编test.vcxproj)共享的文件。   这会导致错误的清除和重新生成行为。
-  Assembling controller.asm...
-controller.asm(59): warning A6004: procedure argument or local not referenced : button
   Assembling model.asm...
 model.asm(237): warning A6004: procedure argument or local not referenced : id
   acllib.lib(acllib.obj) : 找到 MSIL .netmodule 或使用 /GL 编译的模块；正在使用 /LTCG 重新启动链接；将 /LTCG 添加到链接命令行以改进链接器性能

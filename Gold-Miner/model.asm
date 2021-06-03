@@ -39,6 +39,8 @@ szFmt4 BYTE '未命中物体！', 0ah, 0
 szFmt5 BYTE '断点...', 0ah, 0
 szFmt6 BYTE 'eax=%d', 0ah, 0
 szFmt7 BYTE 'In timer, hoosStat=%d, hookODir=%d, hookDeg=%d, hookPosX=%d, hookPosY=%d', 0ah, 0
+szFmt8 BYTE '随机初始化第%d个物体...posX=%d, posY=%d, radius=%d, typ=%d', 0ah, 0
+
 
 .code
 
@@ -143,7 +145,7 @@ LoopTraverseItem:
 
 	inc edi; 遍历变量++
 	cmp edi, itemNum; 检查循环是否结束
-	jb LoopTraverseItem; 循环未结束，进行下一轮循环
+	jne LoopTraverseItem; 循环未结束，进行下一轮循环
 	jmp NotHit; 循环结束且未命中，跳转到NotHit
 
 Hit:
@@ -154,10 +156,8 @@ Hit:
 	; 写hookDir为1
 	mov eax, 1
 	mov hookDir, eax
-	; 写hookV = 100-物体重量（f具体表达式待定）
-	;mov ebx, 100;
-	;sub ebx, Items[edi].weight;
-	mov ebx,10; 测试命中后速度为10 TODO 速度设为1好像不动了
+	; 写hookV = 物体重量
+	mov ebx, Items[edi].weight;
 	mov hookV, ebx
 	jmp Finish
 NotHit:
@@ -321,11 +321,12 @@ IniItem:
 	call crt_srand
 	add esp, 4
 
-	mov ecx, itemNum; (ecx)是循环变量
 	mov edi, 0; 数组偏移初值
-	RandLoop:
+RandLoop:
+		;invoke printf, OFFSET szFmt8, edi
+		; exist属性赋为1
 		mov eax, 1
-		mov Item[edi].exist, eax
+		mov Items[edi].exist, eax
 
 		invoke crt_rand; 函数返回随机数存在eax中
 		mov edx, 0; 即将使用双字型除法(EDX:EAX)/(SRC)_32
@@ -334,14 +335,14 @@ IniItem:
 
 		.if edx < 3; 0.3概率为石头
 			mov eax, 0
-			mov Item[edi].type, eax
+			mov Items[edi].typ, eax
 		.else
 			.if edx < 8; 0.5概率为金块
 				mov eax, 1
-				mov Item[edi].type, eax
+				mov Items[edi].typ, eax
 			.else
 				mov eax, 2; 0.2概率为钻石
-				mov Item[edi].type, eax
+				mov Items[edi].typ, eax
 			.endif
 		.endif
 
@@ -349,26 +350,26 @@ IniItem:
 		mov edx, 0
 		mov ebx, 420; PosX的上限
 		div ebx; 余数存放在edx中
-		mov Item[edi].posX, edx
+		mov Items[edi].posX, edx
 
 		invoke crt_rand
 		mov edx, 0
 		mov ebx, 700; posY的上限
 		div ebx; 余数存放在edx中
-		mov Item[edi].posY, edx
+		mov Items[edi].posY, edx
 
 		; 设置物体的半径、重量、价值，需要先判断物体类别
-		mov ebx, Item[edi].type
+		mov ebx, Items[edi].typ
 		.if ebx == 2; 钻石
 			mov eax, 10
-			mov Item[edi].radius, eax
+			mov Items[edi].radius, eax
 			mov eax, 120; 每秒运动120像素
-			mov Item[edi].weight, eax
+			mov Items[edi].weight, eax
 			mov eax, 600
-			mov Item[edi].value, eax
+			mov Items[edi].value, eax
 		.endif
 
-		mov ebx, Item[edi].type
+		mov ebx, Items[edi].typ
 		.if ebx == 1; 金块
 			invoke crt_rand; 随机金块尺寸，设定为2:1:1
 			mov edx, 0
@@ -377,31 +378,31 @@ IniItem:
 
 			.if edx < 2; 最小尺寸的金块
 				mov eax, 10
-				mov Item[edi].radius, eax
+				mov Items[edi].radius, eax
 				mov eax, 120
-				mov Item[edi].weight, eax
+				mov Items[edi].weight, eax
 				mov eax, 50
-				mov Item[edi].value, eax
+				mov Items[edi].value, eax
 			.else
 				.if edx < 3
 					mov eax, 18
-					mov Item[edi].radius, eax
+					mov Items[edi].radius, eax
 					mov eax, 80
-					mov Item[edi].weight, eax
+					mov Items[edi].weight, eax
 					mov eax, 100
-					mov Item[edi].value, eax
+					mov Items[edi].value, eax
 				.else
 					mov eax, 40
-					mov Item[edi].radius, eax
+					mov Items[edi].radius, eax
 					mov eax, 30
-					mov Item[edi].weight, eax
+					mov Items[edi].weight, eax
 					mov eax, 500
-					mov Item[edi].value, eax
+					mov Items[edi].value, eax
 				.endif
 			.endif
 		.endif
 
-		mov ebx, Item[edi].type
+		mov ebx, Items[edi].typ
 		.if ebx == 0; 石头
 			invoke crt_rand; 随机石头尺寸，设定为1:1
 			mov edx, 0
@@ -409,30 +410,36 @@ IniItem:
 			div ebx
 			.if edx < 1; 最小尺寸的石头
 				mov eax, 18
-				mov Item[edi].radius, eax
+				mov Items[edi].radius, eax
 				mov eax, 80
-				mov Item[edi].weight, eax
+				mov Items[edi].weight, eax
 				mov eax, 10
-				mov Item[edi].value, eax
+				mov Items[edi].value, eax
 			.else
 				mov eax, 25
-				mov Item[edi].radius, eax
+				mov Items[edi].radius, eax
 				mov eax, 40
-				mov Item[edi].weight, eax
+				mov Items[edi].weight, eax
 				mov eax, 20
-				mov Item[edi].value, eax
+				mov Items[edi].value, eax
 			.endif
 		.endif
 
+
+		invoke printf, OFFSET szFmt8, edi, Items[edi].posX, Items[edi].posY, Items[edi].radius, Items[edi].typ; 测试结果
+
 		inc edi; 增加数组下标
-		loop RandLoop
+		cmp edi, itemNum; 检查循环是否结束
+		jne RandLoop  ; 循环未结束，进行下一轮循环
+
+
 	;end测试
 
 	;测试：calPSin和calPCos是否正常工作（成功）
-	invoke calPSin, 0, 10; 第一个参数是角度（角度制），第二个参数是极径
-	invoke calPSin, 30, 10
-	invoke calPSin, 45, 10
-	invoke calPSin, 60, 10
+	;invoke calPSin, 0, 10; 第一个参数是角度（角度制），第二个参数是极径
+	;invoke calPSin, 30, 10
+	;invoke calPSin, 45, 10
+	;invoke calPSin, 60, 10
 	;end测试
 
 	;测试：手动调用MoveHook移动。

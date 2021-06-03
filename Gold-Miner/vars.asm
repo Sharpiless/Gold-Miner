@@ -77,7 +77,7 @@ Item ENDS; 一个实例占4*7=28B
 Items Item 50 DUP({}); 物体列表(最多有50个物体)
 public Items
 
-itemNum DWORD 1; 物体数量
+itemNum DWORD 10; 物体数量
 public itemNum
 
 ;商店
