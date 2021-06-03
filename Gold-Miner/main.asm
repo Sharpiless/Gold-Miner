@@ -21,6 +21,8 @@ printf PROTO C :ptr sbyte, :VARARG
 
 winTitle byte "黄金矿工", 0
 
+szFmt5 BYTE '断点...', 0ah, 0
+
 Item STRUCT
 	exist DWORD ?; 1存在，0已不存在（得分）
 	typ DWORD ?; 类别
@@ -32,7 +34,6 @@ Item STRUCT
 Item ENDS; 一个实例占4*7=28B
 extern Items:Item; vars中定义的物体数组
 
-szFmt2 BYTE '随机数=%d'
 
 .code  
 
@@ -44,14 +45,18 @@ main proc;
 	invoke initWindow, offset winTitle, 425, 50, 700, 500
 
 
+	;初始化得分
+	mov eax, 0
+	mov playerScore, eax; 当前得分
+
 	;设置当前窗口为1
-	mov eax, 2
+	mov eax, 0
 	mov curWindow, eax
+	invoke Flush
+	
 
-
-	invoke InitGame; 调用initGame
+	;invoke InitGame; 调用initGame
 	invoke registerMouseEvent,iface_mouseEvent ;注册控制流事件。注意，如果要定义按钮动作，进入这个函数内进行函数代码的添加
-	;invoke cancelTimer, 0 ; 关闭定时器
 
 	invoke init_second; 阻塞在init时，才会触发定时器的回调函数
 	ret

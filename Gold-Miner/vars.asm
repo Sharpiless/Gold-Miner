@@ -16,7 +16,7 @@ gameY DWORD 0; 有效区域宽度
 public gameY
 
 ; 时间
-restTime DWORD ?; 当前关卡剩余时间
+restTime DWORD ?; 当前关卡剩余时间(以s为单位)
 public restTime
 
 ; 得分

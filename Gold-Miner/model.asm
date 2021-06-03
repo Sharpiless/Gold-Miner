@@ -30,7 +30,7 @@ calPCos PROTO C :dword, :dword ; 来自StaticLib1.lib，计算PCosθ
 .data
 
 hookODir DWORD ?; 角速度方向。1朝右，0朝左
-timeElapsed DWORD ?; 记录流逝时间
+timeElapsed DWORD ?; 记录流逝时间（单位ms）
 
 szFmt1 BYTE '物体列表中第%d个元素，exist=%d, typ=%d, posX=%d, posY=%d, radius=%d, weight=%d, value=%d', 0ah, 0
 szFmt2 BYTE '%d号计时器响应, 时间已流逝%d ms', 0ah, 0
@@ -40,6 +40,7 @@ szFmt5 BYTE '断点...', 0ah, 0
 szFmt6 BYTE 'eax=%d', 0ah, 0
 szFmt7 BYTE 'In timer, hoosStat=%d, hookODir=%d, hookDeg=%d, hookPosX=%d, hookPosY=%d', 0ah, 0
 szFmt8 BYTE '随机初始化第%d个物体...posX=%d, posY=%d, radius=%d, typ=%d', 0ah, 0
+
 
 
 .code
@@ -223,21 +224,43 @@ IsOut proc C
 	ret
 IsOut endp
 
+
+; @brief: 时间结束，根据分数是否到达目标分数切换界面强制切换到商店界面
+IsTimeOut proc C
+	; timeElapsed对1000取余，若余数为0，restTime--
+	mov edx, 0
+	mov eax, timeElapsed
+	mov ebx, 1000
+	div ebx ; 余数在edx中
+	.if edx == 0
+		dec restTime;  时间减少1s
+	.endif
+	.if restTime == 0
+		invoke cancelTimer, 0  ; 取消定时器
+		mov eax, 2
+		mov curWindow, eax; 切换到商店界面	
+		invoke Flush
+	.endif
+	ret
+IsTimeOut endp
+
 ;@brief:定时器回调函数。每次触发定时器，调用MoveHook移动钩索，并调用IsHit和IsOut
 ;@param:定时器id
 timer proc C id:dword
-	add timeElapsed, 20; 维护流逝的时间，单位ms
+	add timeElapsed, 10; 维护流逝的时间，单位ms
 	;invoke printf, OFFSET szFmt2, id , timeElapsed
 	invoke MoveHook; 移动钩索
 	invoke IsHit;
 	invoke IsOut;
-
 	;invoke printf, OFFSET szFmt7, hookStat, hookODir, hookDeg, hookPosX, hookPosY
 	invoke Flush; 绘图主调函数
-	
+	invoke IsTimeOut
 	;invoke printf, OFFSET szFmt2, id, timeElapsed; 打印定时器回调函数信息
 	ret
 timer endp
+
+
+
 
 
 ;@brief:初始化游戏，为一局游戏中用到的全局变量赋初值，注册并启动定时器。
@@ -253,15 +276,15 @@ IniGameSize:
 
 	; 初始化时间
 IniTime:
-	mov eax, 30
+	mov eax, 1
 	mov restTime, eax; 剩余时间30s
+	mov eax, 0
+	mov timeElapsed, 0;  流逝时间
 
 	; 初始化得分
 IniScore:
 	mov eax, 50
 	mov goalScore, eax; 目标得分
-	mov eax, 0
-	mov playerScore, eax; 当前得分
 
 
 	; 初始化矿工
