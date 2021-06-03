@@ -4,13 +4,15 @@ option casemap:none
 
 INCLUDELIB acllib.lib
 INCLUDELIB lrfLib.lib
+includelib StaticLib1.lib
+
 include include\acllib.inc
 include include\vars.inc
 include include\model.inc
 include include\msvcrt.inc
 
-calPsin PROTO C :dword, :dword
-calPcos PROTO C :dword, :dword
+calPSin PROTO C :dword, :dword
+calPCos PROTO C :dword, :dword
 myitoa PROTO C :dword, :ptr sbyte
 printf proto C :dword,:vararg
 
@@ -30,6 +32,10 @@ Item ENDS; 一个实例占4*7=28B
 extern Items :Item
 
 .data	
+
+hookpx DWORD ?
+hookpy DWORD ?
+
 srcini byte "..\resource\icon\window.jpg", 0
 srcgame1 byte "..\resource\icon\game1.jpg", 0
 srcdigger byte "..\resource\icon\digger.jpg", 0
@@ -43,7 +49,6 @@ srcgold byte "..\resource\icon\gold.jpg", 0
 srcxpx byte "..\resource\icon\xpx.jpg", 0 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 srcdiamond byte "..\resource\icon\diamond.jpg", 0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 srcbigstone byte "..\resource\icon\bigstone.jpg", 0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 
 
 
@@ -173,12 +178,31 @@ mainwindow:
 	pop edi
 	pop ebx
 	;画小螃蟹
+
+	.if hookStat==0
+		invoke calPSin, hookDeg, 30; Δx = -ρsinΘ
+		mov ebx,hookPosX
+		sub ebx, eax
+		mov hookpx,ebx
+		invoke calPCos, hookDeg, 30; Δy = ρcosΘ
+		mov ebx,hookPosY
+		add ebx, eax
+		mov hookpy,ebx
+	.else
+		mov ebx,hookPosX
+		mov hookpx,ebx
+		mov ebx,hookPosY
+		mov hookpy,ebx
+	.endif
+
+
+
 	push ebx;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	push eax;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	mov ebx,hookPosY;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	mov ebx,hookpy;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	mov eax,12;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	sub ebx,eax;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	mov eax,hookPosX
+	mov eax,hookpx
 	add eax,80
 	invoke putImageScale, offset imgxpx, ebx, eax, 25, 25	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	pop eax;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -208,10 +232,10 @@ mainwindow:
 	invoke setTextBkColor, colorWHITE
 	invoke paintText, 60, 10, offset strTime	;显示剩余时间
 	push eax
-	mov eax,hookPosX
+	mov eax,hookpx
 	add eax,80
 
-	invoke line, hookPosY, eax, 350, 80;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	invoke line, hookpy, eax, 350, 80;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	pop eax
 	invoke setTextSize, 15;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	invoke setTextColor, 00cc9988h;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

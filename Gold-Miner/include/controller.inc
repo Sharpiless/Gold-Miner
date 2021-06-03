@@ -1,0 +1,1 @@
+iface_mouseEvent PROTO C :dword,:dword,:dword,:dword

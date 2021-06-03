@@ -38,6 +38,7 @@ szFmt3 BYTE '命中第%d个物体！距离=%d, 物体半径=%d', 0ah, 0
 szFmt4 BYTE '未命中物体！', 0ah, 0
 szFmt5 BYTE '断点...', 0ah, 0
 szFmt6 BYTE 'eax=%d', 0ah, 0
+szFmt7 BYTE 'In timer, hoosStat=%d, hookODir=%d, hookDeg=%d, hookPosX=%d, hookPosY=%d', 0ah, 0
 
 .code
 
@@ -97,7 +98,7 @@ ChangeDeg: ; 改变钩索角度
 		mov ebx, 360
 		mov ecx, hookOmega
 		sub ebx, ecx
-		.if hookDeg > ebx ; 若到达右端尽头(不够加)，即hookDeg>360-hookOmega,不移动，并反转钩索角速度
+		.if hookDeg >= ebx ; 若到达右端尽头(不够加)，即hookDeg>360-hookOmega,不移动，并反转钩索角速度
 			mov ebx, 1
 			mov hookODir, ebx
 		.else 
@@ -108,7 +109,7 @@ ChangeDeg: ; 改变钩索角度
 		mov ebx, 180
 		mov ecx, hookOmega
 		add ebx, ecx
-		.if hookDeg < ebx ; 若到达左端尽头(不够减)，即hookDeg<180+hookOmega,不移动，并反转钩索角速度
+		.if hookDeg <= ebx ; 若到达左端尽头(不够减)，即hookDeg<180+hookOmega,不移动，并反转钩索角速度
 			mov ebx, 0
 			mov hookODir, ebx
 		.else 
@@ -134,14 +135,16 @@ IsHit proc C
 LoopTraverseItem:
 	
 	; 读hookPosX，hookPosY，Items，将计算得到的距离存入eax。
-	invoke calDistance, hookPosX, hookPosY, Items[edi].posX, Items[edi].posY
-	cmp eax, Items[edi].radius;比较大小
-	jb Hit; 距离小于半径，跳转到Hit。相当于break
-	
+	.if Items[edi].exist == 1
+		invoke calDistance, hookPosX, hookPosY, Items[edi].posX, Items[edi].posY
+		cmp eax, Items[edi].radius;比较大小
+		jb Hit; 距离小于半径，跳转到Hit。相当于break
+	.endif
+
 	inc edi; 遍历变量++
 	cmp edi, itemNum; 检查循环是否结束
 	jb LoopTraverseItem; 循环未结束，进行下一轮循环
-	jmp NotHit; 未命中，跳转到NotHit
+	jmp NotHit; 循环结束且未命中，跳转到NotHit
 
 Hit:
 	invoke printf, OFFSET szFmt3, edi, eax, Items[edi].radius; 打印命中信息，eax是距离
@@ -175,13 +178,14 @@ IsOut proc C
 	mov ebx, hookPosY; 读hookPosY
 	
 	;测试:打印hookPosX
-	push eax
-	invoke printf, OFFSET szFmt6, eax
-	pop eax
+	;push eax
+	;invoke printf, OFFSET szFmt6, eax
+	;pop eax
 	;end测试
 
-	.if eax > 80000000H; 钩子回到矿工手中。注意钩索未释放时hookPosX=0，不进入该逻辑。 <0不达意
+	.if eax > 80000001H; 钩子回到矿工手中。注意钩索未释放时hookPosX=0，不进入该逻辑。 <0不达意
 		invoke printf, OFFSET szFmt5; 测试断点
+		
 		; 写hookStat为0
 		mov eax, 0
 		mov hookStat, eax
@@ -220,11 +224,14 @@ IsOut endp
 ;@param:定时器id
 timer proc C id:dword
 	add timeElapsed, 20; 维护流逝的时间，单位ms
-	invoke printf, OFFSET szFmt2, id , timeElapsed
+	;invoke printf, OFFSET szFmt2, id , timeElapsed
 	invoke MoveHook; 移动钩索
 	invoke IsHit;
 	invoke IsOut;
+
+	;invoke printf, OFFSET szFmt7, hookStat, hookODir, hookDeg, hookPosX, hookPosY
 	invoke Flush; 绘图主调函数
+	
 	;invoke printf, OFFSET szFmt2, id, timeElapsed; 打印定时器回调函数信息
 	ret
 timer endp
@@ -266,13 +273,13 @@ IniMiner:
 	; 初始化钩子变量
 IniHook:
 	; A
-	mov eax, 1;
+	mov eax, 0;
 	mov hookStat, eax; 设置hookStat
 	mov eax, 0; 
 	mov hookODir, eax; 设置hookODir，初始化为0
 	mov eax, 0; 
 	mov hookDir, eax; 设置hookDir, 初始化为0
-	mov eax, 2; 
+	mov eax, 5; 
 	mov hookOmega, eax; 设置角速度为2
 	mov eax, 10; 
 	mov hookV, eax; 设置线速度（默认为10）
@@ -313,12 +320,12 @@ IniItem:
 	;end测试
 
 	;测试：手动调用MoveHook移动。
-	invoke MoveHook
+	;invoke MoveHook
 	;end测试
 
 	;测试：手动调用isHit和isOut
-	invoke IsHit
-	invoke IsOut
+	;invoke IsHit
+	;invoke IsOut
 	;end测试
 
 	;测试：注册并启动定时器。（成功，当阻塞在main中的init_second时，定时器工作）

@@ -12,13 +12,14 @@ include include\model.inc
 include include\acllib.inc
 include include\msvcrt.inc
 include include\view.inc
+include include\controller.inc
 printf PROTO C :ptr sbyte, :VARARG
+
 
 
 .data
 
 winTitle byte "黄金矿工", 0
-szFmt5 byte "断点...", 0ah, 0
 
 Item STRUCT
 	exist DWORD ?; 1存在，0已不存在（得分）
@@ -42,10 +43,6 @@ main proc;
 	invoke init_first  
 	invoke initWindow, offset winTitle, 425, 50, 700, 500
 
-	;测试：产生随机数（成功）
-	;invoke crt_rand
-	;invoke printf, OFFSET szFmt2, eax
-	;end测试
 
 	;设置当前窗口为1
 	mov eax, 1
@@ -53,7 +50,7 @@ main proc;
 
 
 	invoke InitGame; 调用initGame
-	;invoke registerMouseEvent,iface_mouseEvent ;注册控制流事件, 注意，如果要定义按钮动作，进入这个函数内进行函数代码的添加
+	invoke registerMouseEvent,iface_mouseEvent ;注册控制流事件。注意，如果要定义按钮动作，进入这个函数内进行函数代码的添加
 	;invoke cancelTimer, 0 ; 关闭定时器
 
 	invoke init_second; 阻塞在init时，才会触发定时器的回调函数

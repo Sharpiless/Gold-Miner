@@ -53,5 +53,8 @@
     <None Include="include\view.inc">
       <Filter>头文件</Filter>
     </None>
+    <None Include="include\controller.inc">
+      <Filter>头文件</Filter>
+    </None>
   </ItemGroup>
 </Project>

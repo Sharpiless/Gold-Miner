@@ -161,6 +161,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="include\acllib.inc" />
+    <None Include="include\controller.inc" />
     <None Include="include\model.inc" />
     <None Include="include\msvcrt.inc" />
     <None Include="include\test.inc" />

@@ -56,8 +56,7 @@ main proc C
 	;invoke printf, offset szFmt3, edi, department[edi].IdNum
 
 	;测试减法减为负数的情况
-	mov eax, 5;
-	sub eax, 6;
+	mov eax, 0;
 
 	.if eax > 80000000H ; 这样写判断负数，好像达意
 	;.if eax < 0;  注意：比较时将eax当作无符号数，因此-1即FFFFFFFF大于0，即逻辑表达式不符合预期功能
