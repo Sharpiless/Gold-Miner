@@ -312,6 +312,122 @@ IniItem:
 	invoke	printf, OFFSET szFmt1, edi, Items[edi].exist, Items[edi].typ, Items[edi].posX, Items[edi].posY, Items[edi].radius, Items[edi].weight, Items[edi].value; 打印查看赋值是否成功。
 	;end测试
 
+	; 测试：随机初始化物体列表
+	; 用时间作为随机数种子
+	push 0
+	call crt_time
+	add esp, 4
+	push eax
+	call crt_srand
+	add esp, 4
+
+	mov ecx, itemNum; (ecx)是循环变量
+	mov edi, 0; 数组偏移初值
+	RandLoop:
+		mov eax, 1
+		mov Item[edi].exist, eax
+
+		invoke crt_rand; 函数返回随机数存在eax中
+		mov edx, 0; 即将使用双字型除法(EDX:EAX)/(SRC)_32
+		mov ebx, 10;
+		div ebx; 余数0~9放在edx中
+
+		.if edx < 3; 0.3概率为石头
+			mov eax, 0
+			mov Item[edi].type, eax
+		.else
+			.if edx < 8; 0.5概率为金块
+				mov eax, 1
+				mov Item[edi].type, eax
+			.else
+				mov eax, 2; 0.2概率为钻石
+				mov Item[edi].type, eax
+			.endif
+		.endif
+
+		invoke crt_rand
+		mov edx, 0
+		mov ebx, 420; PosX的上限
+		div ebx; 余数存放在edx中
+		mov Item[edi].posX, edx
+
+		invoke crt_rand
+		mov edx, 0
+		mov ebx, 700; posY的上限
+		div ebx; 余数存放在edx中
+		mov Item[edi].posY, edx
+
+		; 设置物体的半径、重量、价值，需要先判断物体类别
+		mov ebx, Item[edi].type
+		.if ebx == 2; 钻石
+			mov eax, 10
+			mov Item[edi].radius, eax
+			mov eax, 120; 每秒运动120像素
+			mov Item[edi].weight, eax
+			mov eax, 600
+			mov Item[edi].value, eax
+		.endif
+
+		mov ebx, Item[edi].type
+		.if ebx == 1; 金块
+			invoke crt_rand; 随机金块尺寸，设定为2:1:1
+			mov edx, 0
+			mov ebx, 4
+			div ebx
+
+			.if edx < 2; 最小尺寸的金块
+				mov eax, 10
+				mov Item[edi].radius, eax
+				mov eax, 120
+				mov Item[edi].weight, eax
+				mov eax, 50
+				mov Item[edi].value, eax
+			.else
+				.if edx < 3
+					mov eax, 18
+					mov Item[edi].radius, eax
+					mov eax, 80
+					mov Item[edi].weight, eax
+					mov eax, 100
+					mov Item[edi].value, eax
+				.else
+					mov eax, 40
+					mov Item[edi].radius, eax
+					mov eax, 30
+					mov Item[edi].weight, eax
+					mov eax, 500
+					mov Item[edi].value, eax
+				.endif
+			.endif
+		.endif
+
+		mov ebx, Item[edi].type
+		.if ebx == 0; 石头
+			invoke crt_rand; 随机石头尺寸，设定为1:1
+			mov edx, 0
+			mov ebx, 2
+			div ebx
+			.if edx < 1; 最小尺寸的石头
+				mov eax, 18
+				mov Item[edi].radius, eax
+				mov eax, 80
+				mov Item[edi].weight, eax
+				mov eax, 10
+				mov Item[edi].value, eax
+			.else
+				mov eax, 25
+				mov Item[edi].radius, eax
+				mov eax, 40
+				mov Item[edi].weight, eax
+				mov eax, 20
+				mov Item[edi].value, eax
+			.endif
+		.endif
+
+		inc edi; 增加数组下标
+		loop RandLoop
+	;end测试
+
 	;测试：calPSin和calPCos是否正常工作（成功）
 	invoke calPSin, 0, 10; 第一个参数是角度（角度制），第二个参数是极径
 	invoke calPSin, 30, 10
