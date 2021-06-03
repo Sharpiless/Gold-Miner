@@ -45,7 +45,7 @@ main proc;
 
 
 	;设置当前窗口为1
-	mov eax, 1
+	mov eax, 2
 	mov curWindow, eax
 
 
@@ -54,7 +54,6 @@ main proc;
 	;invoke cancelTimer, 0 ; 关闭定时器
 
 	invoke init_second; 阻塞在init时，才会触发定时器的回调函数
-
 	ret
 
 main endp

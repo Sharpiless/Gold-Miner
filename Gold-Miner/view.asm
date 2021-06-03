@@ -83,8 +83,6 @@ titleTime byte "时 间：", 0
 titleGoal byte "目 标 分 数：", 0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 strGoal byte 10 DUP(0);;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-szFmt1 BYTE '绘制第%d个物体...posX=%d, posY=%d, radius=%d, typ=%d', 0ah, 0
-		
 
 .code
 
@@ -120,15 +118,17 @@ DrawItem proc C x: dword, y: dword, r: dword, t: dword		;只能在启动了paint时调用
 	mov r,ebx
 	pop ebx
 	mov eax,t
-	.if eax==0
+
+	; yyx改：改序号和物体的对应关系
+	.if eax==0 ; 石头
 		invoke loadImage, offset srcgold, offset imggold
-		invoke putImageScale, offset imggold, y, x, r, r
-	.elseif eax==1	
+		invoke putImageScale, offset imgbigstone, y, x, r, r
+	.elseif eax==1 ; 金块
 		invoke loadImage, offset srcdiamond, offset imgdiamond
-		invoke putImageScale, offset imgdiamond, y, x, r, r
-	.elseif eax==2;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+		invoke putImageScale, offset imggold, y, x, r, r
+	.elseif eax==2 ; 钻石
 		invoke loadImage, offset srcbigstone, offset imgbigstone;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-		invoke putImageScale, offset imgbigstone, y, x, r, r;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+		invoke putImageScale, offset imgdiamond, y, x, r, r;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	.endif
 	pop eax
 	ret
@@ -166,19 +166,21 @@ mainwindow:
 	invoke beginPaint
 	invoke putImageScale, offset imggame1, 0, 0, 700, 500	;绘制背景
 	invoke putImageScale, offset imgdigger, 325, 15, 50, 65		;绘制矿工
-	;绘制物品
+
+	;绘制物品 TODO yyx改：edi+=1改为edi+=28
 	push ebx					
 	push edi
 	mov edi,0
-	mov ebx,itemNum
+	mov eax, itemNum; 将ebx设置为itemNum*28
+	mov ebx, 28;
+	mul ebx;
+	mov ebx, eax
 	.while edi<ebx
-
-		invoke printf, OFFSET szFmt1, edi, Items[edi].posX, Items[edi].posY, Items[edi].radius, Items[edi].typ; 测试结果
 
 		.if Items[edi].exist == 1  ; yyx加，仅在exist=1时绘制物体
 			invoke DrawItem, Items[edi].posX, Items[edi].posY, Items[edi].radius, Items[edi].typ
 		.endif
-		inc edi
+		add edi, 28; 增加数组下标。注意现在加的是28，一个结构体元素的大小
 	.endw
 	pop edi
 	pop ebx

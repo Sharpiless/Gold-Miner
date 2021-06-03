@@ -89,7 +89,7 @@ ChangePos: ;改变钩索位置
 	add hookPosY, eax
 	.if lastHit != -1
 		mov edi, lastHit
-		sub Items[edi].posY, eax
+		add Items[edi].posY, eax
 	.endif
 	
 	jmp FinishMoveHook
@@ -143,13 +143,16 @@ LoopTraverseItem:
 		jb Hit; 距离小于半径，跳转到Hit。相当于break
 	.endif
 
-	inc edi; 遍历变量++
-	cmp edi, itemNum; 检查循环是否结束
+	add edi, 28; 增加数组下标。注意现在加的是28，一个结构体元素的大小
+	mov eax, itemNum
+	mov ebx, 28;
+	mul ebx;
+	cmp edi, eax; 检查循环是否结束,结束条件：edi==itemNum*28
 	jne LoopTraverseItem; 循环未结束，进行下一轮循环
 	jmp NotHit; 循环结束且未命中，跳转到NotHit
 
 Hit:
-	invoke printf, OFFSET szFmt3, edi, eax, Items[edi].radius; 打印命中信息，eax是距离
+	;invoke printf, OFFSET szFmt3, edi, eax, Items[edi].radius; 打印命中信息，eax是距离
 	; 写lastHit为命中物体的下标
 	mov eax, edi
 	mov lastHit, eax
@@ -184,7 +187,7 @@ IsOut proc C
 	;end测试
 
 	.if eax > 80000001H; 钩子回到矿工手中。注意钩索未释放时hookPosX=0，不进入该逻辑。 <0不达意
-		invoke printf, OFFSET szFmt5; 测试断点
+		;invoke printf, OFFSET szFmt5; 测试断点
 		
 		; 写hookStat为0
 		mov eax, 0
@@ -323,8 +326,16 @@ IniHook:
 
 	mov edi, 0; 数组偏移初值
 RandLoop:
+
+	;edi*28作为偏移量，存入ecx，取结构体数组中第edi个元素。
+	;mov eax, edi;
+	;mov ecx, 28;
+	;mul ecx;
+	;mov ecx, eax;
+
 	; exist属性赋为1
 	mov eax, 1
+	;mov Items[ecx].exist, eax
 	mov Items[edi].exist, eax
 
 	invoke crt_rand; 函数返回随机数存在eax中
@@ -424,18 +435,24 @@ RandLoop:
 		.endif
 	.endif
 
-	inc edi; 增加数组下标
-	cmp edi, itemNum; 检查循环是否结束
+	add edi, 28; 增加数组下标。注意现在加的是28，一个结构体元素的大小
+	mov eax, itemNum
+	mov ebx, 28;
+	mul ebx;
+	cmp edi, eax; 检查循环是否结束,结束条件：edi==itemNum*28
 	jne RandLoop  ; 循环未结束，进行下一轮循环
 
 
 	;测试：随机初始化是否正确
-	mov edi, 0; 数组偏移初值
-Test1:
-	invoke printf, OFFSET szFmt8, edi, Items[edi].posX, Items[edi].posY, Items[edi].radius, Items[edi].typ; 测试结果
-	inc edi; 增加数组下标
-	cmp edi, itemNum; 检查循环是否结束
-	jne Test1  ; 循环未结束，进行下一轮循环
+	;mov edi, 0; 数组偏移初值
+;Test1:
+	;invoke printf, OFFSET szFmt8, edi, Items[edi].posX, Items[edi].posY, Items[edi].radius, Items[edi].typ; 测试结果
+	;add edi, 28; 增加数组下标。注意现在加的是28，一个结构体元素的大小
+	;mov eax, itemNum
+	;mov ebx, 28;
+	;mul ebx;
+	;cmp edi, eax; 检查循环是否结束
+	;jne Test1  ; 循环未结束，进行下一轮循环
 	;end测试
 
 	
