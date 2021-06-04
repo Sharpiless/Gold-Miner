@@ -121,13 +121,13 @@ DrawItem proc C x: dword, y: dword, r: dword, t: dword		;只能在启动了paint时调用
 
 	; yyx改：改序号和物体的对应关系
 	.if eax==0 ; 石头
-		invoke loadImage, offset srcgold, offset imggold
+		invoke loadImage, offset srcbigstone, offset imgbigstone
 		invoke putImageScale, offset imgbigstone, y, x, r, r
 	.elseif eax==1 ; 金块
-		invoke loadImage, offset srcdiamond, offset imgdiamond
+		invoke loadImage, offset srcgold, offset imggold
 		invoke putImageScale, offset imggold, y, x, r, r
 	.elseif eax==2 ; 钻石
-		invoke loadImage, offset srcbigstone, offset imgbigstone;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+		invoke loadImage, offset srcdiamond, offset imgdiamond;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		invoke putImageScale, offset imgdiamond, y, x, r, r;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	.endif
 	pop eax
