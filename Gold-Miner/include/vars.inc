@@ -28,7 +28,10 @@ extern tool1:dword
 extern tool2:dword
 extern tool3:dword
 extern tool4:dword
-
+extern price1:dword
+extern price2:dword
+extern price3:dword
+extern price4:dword
 
 
 

@@ -161,8 +161,12 @@ Hit:
 	mov eax, 1
 	mov hookDir, eax
 	; 写hookV = 物体重量
-	mov ebx, Items[edi].weight;
-	mov hookV, ebx
+	mov eax, Items[edi].weight;
+	mov hookV, eax
+	.if tool3 == 0 ; 拥有神水，速度*2
+		mov eax, Items[edi].weight;
+		add hookV, eax
+	.endif
 	jmp Finish
 NotHit:
 	;invoke printf, OFFSET szFmt4; 打印未命中信息
@@ -242,6 +246,11 @@ IsTimeOut proc C
 		.if playerScore >= eax; 过关
 			mov eax, 2
 			mov curWindow, eax; 切换到商店界面	
+			;重置tool们
+			mov tool1, 1
+			mov tool2, 1
+			mov tool3, 1
+			mov tool4, 1
 			invoke Flush; 绘制商店界面
 		.else ; 未过关 TODO
 			mov eax, 0
@@ -266,7 +275,7 @@ timer proc C id:dword
 	invoke MoveHook; 移动钩索
 	invoke IsHit;
 	invoke IsOut;
-	;invoke printf, OFFSET szFmt7, hookStat, hookODir, hookDeg, hookV, hookPosX, hookPosY
+	invoke printf, OFFSET szFmt7, hookStat, hookODir, hookDeg, hookV, hookPosX, hookPosY
 	invoke Flush; 绘图主调函数
 	invoke IsTimeOut
 	;invoke printf, OFFSET szFmt2, id, timeElapsed; 打印定时器回调函数信息
@@ -297,7 +306,7 @@ IniTime:
 
 	; 初始化得分
 IniScore:
-	add goalScore, 500; 目标得分在上一关的基础上增加500
+	add goalScore, 50; 目标得分在上一关的基础上增加500
 
 
 	; 初始化矿工
@@ -407,9 +416,9 @@ RandLoop:
 	; 设置物体的半径、重量、价值，需要先判断物体类别
 	mov ebx, Items[edi].typ
 	.if ebx == 2; 钻石
-		mov eax, 10
+		mov eax, 20
 		mov Items[edi].radius, eax
-		mov eax, 120; 每秒运动120像素
+		mov eax, 12; 每秒运动120像素
 		mov Items[edi].weight, eax
 		mov eax, 600
 		mov Items[edi].value, eax
@@ -423,24 +432,24 @@ RandLoop:
 		div ebx
 
 		.if edx < 2; 最小尺寸的金块
-			mov eax, 10
+			mov eax, 20
 			mov Items[edi].radius, eax
-			mov eax, 120
+			mov eax, 12
 			mov Items[edi].weight, eax
 			mov eax, 50
 			mov Items[edi].value, eax
 		.else
 			.if edx < 3
-				mov eax, 18
+				mov eax, 35
 				mov Items[edi].radius, eax
-				mov eax, 80
+				mov eax, 8
 				mov Items[edi].weight, eax
 				mov eax, 100
 				mov Items[edi].value, eax
 			.else
-				mov eax, 40
+				mov eax, 50
 				mov Items[edi].radius, eax
-				mov eax, 30
+				mov eax, 3
 				mov Items[edi].weight, eax
 				mov eax, 500
 				mov Items[edi].value, eax
@@ -455,19 +464,24 @@ RandLoop:
 		mov ebx, 2
 		div ebx
 		.if edx < 1; 最小尺寸的石头
-			mov eax, 18
+			mov eax, 20
 			mov Items[edi].radius, eax
-			mov eax, 80
+			mov eax, 8
 			mov Items[edi].weight, eax
 			mov eax, 10
 			mov Items[edi].value, eax
 		.else
-			mov eax, 25
+			mov eax, 35
 			mov Items[edi].radius, eax
-			mov eax, 40
+			mov eax, 4
 			mov Items[edi].weight, eax
 			mov eax, 20
 			mov Items[edi].value, eax
+		.endif
+
+		.if tool2 == 0; 拥有石头收藏书,value*2
+			mov eax, Items[edi].value
+			add Items[edi].value, eax
 		.endif
 	.endif
 
@@ -504,7 +518,7 @@ RandLoop:
 
 	;测试：注册并启动定时器。（成功，当阻塞在main中的init_second时，定时器工作）
 	invoke registerTimerEvent, offset timer  ;注册定时器回调函数timer
-	invoke startTimer, 0, 100  ; 定时器编号为0，刷新间隔为10ms
+	invoke startTimer, 0, 100  ; 定时器编号为0，刷新间隔为100ms
 	;end测试
 
 

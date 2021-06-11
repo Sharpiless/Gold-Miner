@@ -83,15 +83,23 @@ public itemNum
 ;ил╣Й
 tool1 dd 1
 public tool1
-
 tool2 dd 1
 public tool2
-
 tool3 dd 1
 public tool3
-
 tool4 dd 1
 public tool4
+
+price1 dd 53
+public price1
+price2 dd 370
+public price2
+price3 dd 156
+public price3
+price4 dd 87
+public price4
+
+
 
 end
 
