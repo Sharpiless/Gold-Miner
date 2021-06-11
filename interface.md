@@ -182,10 +182,9 @@ public price4
 // @params: (x1,y1)第一个点坐标 (x2,y2)第二个点坐标
 // @return: ans,int型距离。
 extern "C" int calDistance(int x1, int y1, int x2, int y2) {
-    int ans = (int)sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+    int ans = round(sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)));
     return ans;
 }
-
 ```
 
 计算psinθ：
@@ -195,7 +194,7 @@ extern "C" int calDistance(int x1, int y1, int x2, int y2) {
 // @params: theta，角度制，实际取值范围[180, 360]；ρ，极径
 // @return: ans
 extern "C" int calPSin(int deg, int r) {
-    int ans = (int)r*sin(deg * 2 * PI / 360);
+    int ans = round(r*sin(deg * 2 * PI / 360));
     return ans;
 }
 ```
@@ -207,7 +206,7 @@ extern "C" int calPSin(int deg, int r) {
 // @params: 同上
 // @return: ans
 extern "C" int calPCos(int deg, int r) {
-    int ans = (int)r*cos(deg * 2 * PI / 360);
+    int ans = round(r*cos(deg * 2 * PI / 360));
     return ans;
 }
 ```
