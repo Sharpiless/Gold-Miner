@@ -37,10 +37,9 @@ szFmt2 BYTE '%d号计时器响应, 时间已流逝%d ms', 0ah, 0
 szFmt3 BYTE '命中第%d个物体！距离=%d, 物体半径=%d', 0ah, 0
 szFmt4 BYTE '未命中物体！', 0ah, 0
 szFmt5 BYTE '断点...', 0ah, 0
-szFmt6 BYTE 'eax=%d', 0ah, 0
-szFmt7 BYTE 'In timer, hoosStat=%d, hookODir=%d, hookDeg=%d, hookV=%d, hookPosX=%d, hookPosY=%d', 0ah, 0
+szFmt6 BYTE '待观察寄存器的值=%d', 0ah, 0
+szFmt7 BYTE 'In timer, hoosStat=%d, hookODir=%d, hookDir=%d, hookDeg=%d, hookV=%d, hookPosX=%d, hookPosY=%d', 0ah, 0
 szFmt8 BYTE '随机初始化第%d个物体...posX=%d, posY=%d, radius=%d, typ=%d', 0ah, 0
-
 
 
 .code
@@ -79,10 +78,20 @@ ChangePos: ;改变钩索位置
 
 	;Step2.PSin送入eax,并写hookPosX
 	invoke calPSin, hookDeg, ebx; Δx = -ρsinΘ
+	;当计算精度不够导致Δx计算结果为0时，需要保证Δx不为零。根据不同情况将Δx设为1或-1
+	.if eax == 0
+		.if hookDir == 0;钩子向下移动
+			mov eax, -1
+		.else ;钩子向上移动
+			mov eax, 1
+		.endif
+	.endif
+
 	sub hookPosX, eax
-	.if lastHit != -1; 若lastHit不为-1，需要带着该物体一起移动
+	.if lastHit != -1; 若lastHit不为-1，需要带着该物体一起移动（将物体位置设置为与钩子位置相同）
 		mov edi, lastHit
-		sub Items[edi].posX, eax
+		mov eax, hookPosX
+		mov Items[edi].posX, eax
 	.endif
 
 	;Step3.PCos送入eax，并写hookPosY
@@ -90,7 +99,8 @@ ChangePos: ;改变钩索位置
 	add hookPosY, eax
 	.if lastHit != -1
 		mov edi, lastHit
-		add Items[edi].posY, eax
+		mov eax, hookPosY
+		mov Items[edi].posY, eax
 	.endif
 	
 	jmp FinishMoveHook
@@ -163,7 +173,7 @@ Hit:
 	; 写hookV = 物体重量
 	mov eax, Items[edi].weight;
 	mov hookV, eax
-	.if tool3 == 0 ; 拥有神水，速度*2
+	.if tool3 == 0 ; 若拥有神水，速度*2
 		mov eax, Items[edi].weight;
 		add hookV, eax
 	.endif
@@ -191,7 +201,7 @@ IsOut proc C
 	;pop eax
 	;end测试
 
-	.if eax > 80000001H; 钩子回到矿工手中。注意钩索未释放时hookPosX=0，不进入该逻辑。 <0不达意
+	.if eax > 80000001H; （即eax是负数）钩子回到矿工手中。注意钩索未释放时hookPosX=0，不进入该逻辑。
 		;invoke printf, OFFSET szFmt5; 测试断点
 		
 		; 写hookStat为0
@@ -216,10 +226,10 @@ IsOut proc C
 	.elseif eax > gameX; 下出界,写hookDir为1
 		mov eax, 1
 		mov hookDir, eax
-	.elseif ebx > 80000000H; 左出界 <0不达意
+	.elseif ebx > 80000000H; （即ebx是负数）左出界，写hookDir为1
 		mov eax, 1
 		mov hookDir, eax
-	.elseif ebx > gameY; 右出界
+	.elseif ebx > gameY; 右出界，写hookDir为1
 		mov eax, 1
 		mov hookDir, eax
 	.endif
@@ -275,13 +285,12 @@ timer proc C id:dword
 	invoke MoveHook; 移动钩索
 	invoke IsHit;
 	invoke IsOut;
-	invoke printf, OFFSET szFmt7, hookStat, hookODir, hookDeg, hookV, hookPosX, hookPosY
+	invoke printf, OFFSET szFmt7, hookStat, hookODir, hookDir, hookDeg, hookV, hookPosX, hookPosY
 	invoke Flush; 绘图主调函数
 	invoke IsTimeOut
 	;invoke printf, OFFSET szFmt2, id, timeElapsed; 打印定时器回调函数信息
 	ret
 timer endp
-
 
 
 
@@ -329,11 +338,11 @@ IniHook:
 	mov hookDir, eax; 设置hookDir, 初始化为0
 	mov eax, 5; 
 	mov hookOmega, eax; 设置角速度为2
-	mov eax, 50; 
-	mov hookV, eax; 设置线速度（默认为50）
+	mov eax, 35;
+	mov hookV, eax; 设置线速度（默认为35）
 
 	; B
-	mov eax, 270; 
+	mov eax, 270;
 	mov hookDeg, eax; 设置hookDeg
 	mov eax, minerPosX;
 	mov hookPosX, eax; 设置hookPosX（即矿工位置x坐标）
@@ -479,7 +488,7 @@ RandLoop:
 			mov Items[edi].value, eax
 		.endif
 
-		.if tool2 == 0; 拥有石头收藏书,value*2
+		.if tool1 == 0; 若拥有石头收藏书,value*2
 			mov eax, Items[edi].value
 			add Items[edi].value, eax
 		.endif
