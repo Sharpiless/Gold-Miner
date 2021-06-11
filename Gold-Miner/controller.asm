@@ -57,10 +57,12 @@ iface_mouseEvent proc C x:dword,y:dword,button:dword,event:dword
 		mov eax, gameX;
 		add eax, 80;
 		invoke is_inside_the_rect,x,y,0,gameY,80,eax; 判断是否在游戏有效区域内
-		.if eax == 1; 在游戏区域，释放钩子。写hookStat，hookDIr，lastHit
+		.if eax == 1; 在游戏区域，释放钩子。写hookStat，hookDir，hookV, lastHit
 			mov hookStat, 1
 			mov hookDir, 0
+			mov hookV, 50 ;(钩索默认速度)
 			mov lastHit, -1
+			
 		.endif
 
 	.elseif curWindow == 2; 在商店

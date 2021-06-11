@@ -43,15 +43,16 @@ main proc;
 	;初始化绘图环境和窗口
 	invoke init_first  
 	invoke initWindow, offset winTitle, 425, 50, 700, 500
-
-
-	;初始化得分
-	mov eax, 0
-	mov playerScore, eax; 当前得分
-
+	
 	;设置当前窗口为1
 	mov eax, 0
 	mov curWindow, eax
+	;重置得分
+	mov eax, 0
+	mov playerScore, eax; 
+	;重置目标得分
+	mov eax, 0
+	mov goalScore, eax
 	invoke Flush
 	
 

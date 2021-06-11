@@ -99,7 +99,7 @@ B：
 
 ; @brief: 鼠标点击游戏区域时，释放钩索。
 ; @read: 无
-; @write: 写`hookStat`为1，写`hookDir`为0，写`lastHit`为-1。
+; @write: 写`hookStat`为1，写`hookDir`为0，写`hookV`为默认值（120），写`lastHit`为-1。
 
 ## 4. 模型
 

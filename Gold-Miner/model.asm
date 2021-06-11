@@ -38,7 +38,7 @@ szFmt3 BYTE '命中第%d个物体！距离=%d, 物体半径=%d', 0ah, 0
 szFmt4 BYTE '未命中物体！', 0ah, 0
 szFmt5 BYTE '断点...', 0ah, 0
 szFmt6 BYTE 'eax=%d', 0ah, 0
-szFmt7 BYTE 'In timer, hoosStat=%d, hookODir=%d, hookDeg=%d, hookPosX=%d, hookPosY=%d', 0ah, 0
+szFmt7 BYTE 'In timer, hoosStat=%d, hookODir=%d, hookDeg=%d, hookV=%d, hookPosX=%d, hookPosY=%d', 0ah, 0
 szFmt8 BYTE '随机初始化第%d个物体...posX=%d, posY=%d, radius=%d, typ=%d', 0ah, 0
 
 
@@ -235,11 +235,25 @@ IsTimeOut proc C
 	.if edx == 0
 		dec restTime;  时间减少1s
 	.endif
-	.if restTime == 0
+
+	.if restTime == 0; 时间结束，强制切换界面
 		invoke cancelTimer, 0  ; 取消定时器
-		mov eax, 2
-		mov curWindow, eax; 切换到商店界面	
-		invoke Flush
+		mov eax, goalScore
+		.if playerScore >= eax; 过关
+			mov eax, 2
+			mov curWindow, eax; 切换到商店界面	
+			invoke Flush; 绘制商店界面
+		.else ; 未过关 TODO
+			mov eax, 0
+			mov curWindow, eax;
+			; 重置得分
+			mov eax, 0
+			mov playerScore, eax; 
+			; 重置目标得分
+			mov eax, 0
+			mov goalScore, eax
+			invoke Flush; 绘制欢迎界面
+		.endif
 	.endif
 	ret
 IsTimeOut endp
@@ -247,12 +261,12 @@ IsTimeOut endp
 ;@brief:定时器回调函数。每次触发定时器，调用MoveHook移动钩索，并调用IsHit和IsOut
 ;@param:定时器id
 timer proc C id:dword
-	add timeElapsed, 10; 维护流逝的时间，单位ms
+	add timeElapsed, 100; 维护流逝的时间，单位ms
 	;invoke printf, OFFSET szFmt2, id , timeElapsed
 	invoke MoveHook; 移动钩索
 	invoke IsHit;
 	invoke IsOut;
-	;invoke printf, OFFSET szFmt7, hookStat, hookODir, hookDeg, hookPosX, hookPosY
+	;invoke printf, OFFSET szFmt7, hookStat, hookODir, hookDeg, hookV, hookPosX, hookPosY
 	invoke Flush; 绘图主调函数
 	invoke IsTimeOut
 	;invoke printf, OFFSET szFmt2, id, timeElapsed; 打印定时器回调函数信息
@@ -276,15 +290,14 @@ IniGameSize:
 
 	; 初始化时间
 IniTime:
-	mov eax, 1
+	mov eax, 30
 	mov restTime, eax; 剩余时间30s
 	mov eax, 0
 	mov timeElapsed, 0;  流逝时间
 
 	; 初始化得分
 IniScore:
-	mov eax, 50
-	mov goalScore, eax; 目标得分
+	add goalScore, 500; 目标得分在上一关的基础上增加500
 
 
 	; 初始化矿工
@@ -307,8 +320,8 @@ IniHook:
 	mov hookDir, eax; 设置hookDir, 初始化为0
 	mov eax, 5; 
 	mov hookOmega, eax; 设置角速度为2
-	mov eax, 10; 
-	mov hookV, eax; 设置线速度（默认为10）
+	mov eax, 50; 
+	mov hookV, eax; 设置线速度（默认为50）
 
 	; B
 	mov eax, 270; 
@@ -491,7 +504,7 @@ RandLoop:
 
 	;测试：注册并启动定时器。（成功，当阻塞在main中的init_second时，定时器工作）
 	invoke registerTimerEvent, offset timer  ;注册定时器回调函数timer
-	invoke startTimer, 0, 10  ; 定时器编号为0，刷新间隔为10ms
+	invoke startTimer, 0, 100  ; 定时器编号为0，刷新间隔为10ms
 	;end测试
 
 

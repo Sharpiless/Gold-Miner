@@ -40,7 +40,9 @@ var dword 10
 .code  
 
 main proc C
-	;invoke testProc; 调用initGame
+	
+	mov var, 5;
+
 	mov edi,0; 访问数组的偏移量
 	mov eax,8;
 	;亲测可用，为结构体数组中某个实例赋值。因为Years成员的长度是WORD，因此源操作数应该是ax
