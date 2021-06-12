@@ -276,6 +276,8 @@ IsTimeOut proc C
 			mov tool2, 1
 			mov tool3, 1
 			mov tool4, 1
+			mov tool5, 1
+			mov tool6, 1
 			mov eax, 2
 			mov curWindow, eax; 切换到商店界面	
 			invoke Flush; 绘制商店界面

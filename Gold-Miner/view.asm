@@ -30,6 +30,10 @@ Item STRUCT
 	value DWORD ?; 价值
 Item ENDS; 一个实例占4*7=28B
 extern Items :Item
+extern tool5:dword; TODO extern语句放在这就能跑了
+extern tool6:dword
+extern price5:dword
+extern price6:dword
 
 .data	
 
@@ -330,8 +334,8 @@ store:
 		invoke paintText, 230, 220, offset strprice4
 	.endif
 	mov eax, 1
-	.if eax == 1
-	;.if eax == tool5
+	;.if eax == 1
+	.if eax == tool5
 		invoke putImageScale, offset imgmagnet, 160, 150, 60, 60
 		invoke setTextSize, 20
 		invoke setTextColor, 00cc9988h
@@ -340,8 +344,8 @@ store:
 	.endif
 	
 	mov eax, 1
-	.if eax == 1
-	;.if eax == tool6
+	;.if eax == 1
+	.if eax == tool6
 		invoke putImageScale, offset imgehook, 100, 150, 60, 60
 		invoke setTextSize, 20
 		invoke setTextColor, 00cc9988h

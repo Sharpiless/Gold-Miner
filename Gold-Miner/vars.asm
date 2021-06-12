@@ -103,10 +103,10 @@ price3 dd 156
 public price3
 price4 dd 87
 public price4
-;price5 dd 220
-;public price5
-;price6 dd 270
-;public price6
+price5 dd 220
+public price5
+price6 dd 270
+public price6
 
 
 fireNum dd 0

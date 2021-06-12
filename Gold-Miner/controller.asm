@@ -20,8 +20,10 @@ Item STRUCT
 	value DWORD ?; 价值
 Item ENDS; 一个实例占4*7=28B
 extern Items:Item; vars中定义的物体数组
-extern tool5:dword
+extern tool5:dword; TODO extern语句放在这就能跑了
 extern tool6:dword
+extern price5:dword
+extern price6:dword
 
 printf PROTO C :ptr DWORD, :VARARG
 calPSin PROTO C :dword, :dword ; 来自StaticLib1.lib，计算PSinθ
@@ -39,8 +41,6 @@ strLeft sbyte "按下向左", 0ah, 0
 strRight sbyte "按下向右", 0ah, 0
 
 
-price5 dd 220
-price6 dd 270
 
 
 .code
@@ -91,7 +91,7 @@ iface_keyboardEvent proc C key:dword, event:dword
 			mov Items[edi].exist, eax 
 		.endif
 
-		.if ((key == VK_LEFT || key == VK_RIGHT) && tool5 == 0 && hookDir == 0); 微调 ;tool5==0
+		.if ((key == VK_LEFT || key == VK_RIGHT) && tool5 == 0 && hookDir == 0); 微调 tool5==0
 			.if key == VK_LEFT; 向左
 				invoke printf, offset strLeft
 				sub hookDeg, 2	
