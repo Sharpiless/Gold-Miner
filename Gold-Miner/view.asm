@@ -221,6 +221,7 @@ mainwindow:
 	invoke putImageScale, offset imgxpx, ebx, eax, 25, 25	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	pop eax;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	pop ebx;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 	invoke setTextSize, 15
 	invoke setTextColor, 00cc9988h
 	invoke setTextBkColor, colorWHITE
@@ -329,8 +330,8 @@ store:
 		invoke paintText, 230, 220, offset strprice4
 	.endif
 	mov eax, 1
-	;.if eax == 1
-	.if eax == tool5
+	.if eax == 1
+	;.if eax == tool5
 		invoke putImageScale, offset imgmagnet, 160, 150, 60, 60
 		invoke setTextSize, 20
 		invoke setTextColor, 00cc9988h
@@ -339,8 +340,8 @@ store:
 	.endif
 	
 	mov eax, 1
-	;.if eax == 1
-	.if eax == tool6
+	.if eax == 1
+	;.if eax == tool6
 		invoke putImageScale, offset imgehook, 100, 150, 60, 60
 		invoke setTextSize, 20
 		invoke setTextColor, 00cc9988h

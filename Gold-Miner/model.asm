@@ -158,7 +158,12 @@ LoopTraverseItem:
 	; 读hookPosX，hookPosY，Items，将计算得到的距离存入eax。
 	.if Items[edi].exist == 1
 		invoke calDistance, hookPosX, hookPosY, Items[edi].posX, Items[edi].posY
-		cmp eax, Items[edi].radius;比较大小
+		mov ebx, Items[edi].radius
+		;.if ( tool6 == 0 && Items[edi].typ == 1);
+		.if Items[edi].typ == 1 ;拥有吸金石,金子半径+20
+			add ebx, 20
+		.endif
+		cmp eax, ebx; 比较大小
 		jb Hit; 距离小于半径，跳转到Hit。相当于break
 	.endif
 
@@ -509,6 +514,8 @@ RandLoop:
 				mov Items[edi].value, eax
 			.endif
 		.endif
+
+
 	.endif
 
 	mov ebx, Items[edi].typ

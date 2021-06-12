@@ -20,6 +20,8 @@ Item STRUCT
 	value DWORD ?; 价值
 Item ENDS; 一个实例占4*7=28B
 extern Items:Item; vars中定义的物体数组
+extern tool5:dword
+extern tool6:dword
 
 printf PROTO C :ptr DWORD, :VARARG
 calPSin PROTO C :dword, :dword ; 来自StaticLib1.lib，计算PSinθ
@@ -31,17 +33,14 @@ calPCos PROTO C :dword, :dword ; 来自StaticLib1.lib，计算PCosθ
 modelMusicset_xpx byte "..\resource\music\set_xpx.mp3", 0
 modelMusicset_xpxP dd 1
 
-coord sbyte "鼠标点击：%d,%d",0ah,0
+coord sbyte "鼠标点击 %d,%d",0ah,0
 strSpace sbyte "按下空格", 0ah, 0
 strLeft sbyte "按下向左", 0ah, 0
-tmp sbyte "hookDeg=%d", 0ah, 0
-
-str1 byte "count=%d", 0ah, 0
-str2 byte "count*hookV=%d", 0ah, 0
-
-tmpVar dd 0
+strRight sbyte "按下向右", 0ah, 0
 
 
+price5 dd 220
+price6 dd 270
 
 
 .code
@@ -92,17 +91,22 @@ iface_keyboardEvent proc C key:dword, event:dword
 			mov Items[edi].exist, eax 
 		.endif
 
-		.if (key == VK_LEFT && tool5 == 0 && hookDir == 0); 向左微调 ;tool5
-			invoke printf, offset strLeft
-			invoke printf, offset str1, count
-			sub hookDeg, 2
+		.if ((key == VK_LEFT || key == VK_RIGHT) && tool5 == 0 && hookDir == 0); 微调 ;tool5==0
+			.if key == VK_LEFT; 向左
+				invoke printf, offset strLeft
+				sub hookDeg, 2	
+			.else; 向右
+				invoke printf, offset strRight
+				add hookDeg, 2
+			.endif
+			
 			; TODO 根据最新的Deg算出对应的posX
 			mov eax, hookV; 乘数放在eax中
 			mov ebx, count
 			mul ebx; 乘法结果在eax中
 			
 			invoke calPSin, hookDeg, eax; Δx = -ρsinΘ
-			mov ebx, minerPosX; hookPosX赋值为Δx
+			mov ebx, minerPosX; hookPosX赋值为minerPosX+Δx
 			mov hookPosX, ebx
 			sub hookPosX, eax
 
@@ -111,19 +115,11 @@ iface_keyboardEvent proc C key:dword, event:dword
 			mov ebx, count
 			mul ebx; 乘法结果在eax中
 			invoke calPCos, hookDeg, eax; 
-			mov ebx, minerPosY;
+			mov ebx, minerPosY;hookPosY赋值为minerPosY+ΔY
 			mov hookPosY, ebx
 			add hookPosY, eax
 			
-			invoke printf, offset tmp, hookDeg
 		.endif
-
-		.if (key == VK_RIGHT && tool5 == 0 && hookDir == 0); 向右微调
-			add hookDeg, 2
-			invoke printf, offset tmp, hookDeg
-		.endif
-
-
 	.endif
 
 not_press:
@@ -225,7 +221,7 @@ iface_mouseEvent proc C x:dword,y:dword,button:dword,event:dword
 			mov eax, price5
 			.if playerScore > eax
 				sub playerScore, eax; 得分减少
-				;mov tool4, 0 ; 购买
+				mov tool5, 0 ; 购买
 				invoke Flush; 刷新界面
 			.endif
 		.endif
@@ -236,7 +232,7 @@ iface_mouseEvent proc C x:dword,y:dword,button:dword,event:dword
 			mov eax, price6
 			.if playerScore > eax
 				sub playerScore, eax; 得分减少
-				;mov tool4, 0 ; 购买
+				mov tool6, 0 ; 购买
 				invoke Flush; 刷新界面
 			.endif
 		.endif
