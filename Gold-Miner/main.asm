@@ -53,12 +53,15 @@ main proc;
 	;重置目标得分
 	mov eax, 0
 	mov goalScore, eax
-	invoke Flush
+	;设置鞭炮数量
+	mov eax, 0
+	mov fireNum, eax
+	invoke Flush; 绘制欢迎界面
 	
 
 	;invoke InitGame; 调用initGame
-	invoke registerMouseEvent,iface_mouseEvent ;注册控制流事件。注意，如果要定义按钮动作，进入这个函数内进行函数代码的添加
-
+	invoke registerMouseEvent,iface_mouseEvent ;注册鼠标事件。
+	invoke registerKeyboardEvent, iface_keyboardEvent ;注册键盘事件
 	invoke init_second; 阻塞在init时，才会触发定时器的回调函数
 	ret
 

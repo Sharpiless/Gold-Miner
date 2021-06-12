@@ -32,6 +32,9 @@ extern price1:dword
 extern price2:dword
 extern price3:dword
 extern price4:dword
+extern fireNum:dword
+
+extern count:dword
 
 
 

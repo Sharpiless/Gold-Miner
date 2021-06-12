@@ -4,17 +4,41 @@ option casemap:none
 
 includelib msvcrt.lib
 includelib acllib.lib
+includelib StaticLib1.lib
 include include\test.inc
 include include\vars.inc
 include include\model.inc
 include include\acllib.inc
 include include\view.inc
 
+Item STRUCT
+	exist DWORD ?; 1存在，0已不存在（得分）
+	typ DWORD ?; 类别
+	posX DWORD ?; 位置横坐标
+	posY DWORD ?; 位置纵坐标
+	radius DWORD ?; 半径
+	weight DWORD ?; 重量
+	value DWORD ?; 价值
+Item ENDS; 一个实例占4*7=28B
+extern Items:Item; vars中定义的物体数组
+
 printf PROTO C :ptr DWORD, :VARARG
+calPSin PROTO C :dword, :dword ; 来自StaticLib1.lib，计算PSinθ
+calPCos PROTO C :dword, :dword ; 来自StaticLib1.lib，计算PCosθ
+
 
 .data
 
-coord sbyte "%d,%d",10,0
+coord sbyte "鼠标点击：%d,%d",0ah,0
+strSpace sbyte "按下空格", 0ah, 0
+strLeft sbyte "按下向左", 0ah, 0
+tmp sbyte "hookDeg=%d", 0ah, 0
+
+str1 byte "count=%d", 0ah, 0
+str2 byte "count*hookV=%d", 0ah, 0
+
+tmpVar dd 0
+
 
 .code
 ;判断点击的坐标是否在矩形框内，是返回1，不是则返回0。
@@ -35,7 +59,76 @@ is_inside_the_rect proc C x:dword,y:dword,left:dword,right:dword,up:dword,bottom
 	ret
 is_inside_the_rect endp
 	
-; 点击相应事件
+
+; 键盘事件回调函数
+iface_keyboardEvent proc C key:dword, event:dword
+	pushad
+	mov ecx,event
+	cmp ecx,KEY_DOWN
+	jne not_press; 若事件不是按下键盘，则不触发任何逻辑
+
+	
+	.if curWindow == 1
+		.if (key == VK_SPACE && fireNum > 0 && hookDir == 1 && lastHit != -1); 空格，释放鞭炮。仅当拥有鞭炮时触发
+			invoke printf, offset strSpace
+			; 鞭炮数量-1
+			dec fireNum 
+			; 写hookStat为0
+			mov eax, 0
+			mov hookStat, eax
+			; 写hookPosX、hookPosY为矿工位置
+			mov eax, minerPosX
+			mov hookPosX, eax
+			mov eax, minerPosY
+			mov hookPosY, eax
+		
+			; 删除物体，写Items[lastHit].exist为0
+			mov edi, lastHit
+			mov eax, 0
+			mov Items[edi].exist, eax 
+		.endif
+
+		.if (key == VK_LEFT && tool4 == 1 && hookDir == 0); 向左微调
+			invoke printf, offset strLeft
+			invoke printf, offset str1, count
+			sub hookDeg, 2
+			; TODO 根据最新的Deg算出对应的posX
+			mov eax, hookV; 乘数放在eax中
+			mov ebx, count
+			mul ebx; 乘法结果在eax中
+			
+			invoke calPSin, hookDeg, eax; Δx = -ρsinΘ
+			mov ebx, minerPosX; hookPosX赋值为Δx
+			mov hookPosX, ebx
+			sub hookPosX, eax
+
+			; TODO 根据最新的Deg算出对应的posY
+			mov eax, hookV; 乘数放在eax中
+			mov ebx, count
+			mul ebx; 乘法结果在eax中
+			invoke calPCos, hookDeg, eax; 
+			mov ebx, minerPosY;
+			mov hookPosY, ebx
+			add hookPosY, eax
+			
+			invoke printf, offset tmp, hookDeg
+		.endif
+
+		.if (key == VK_RIGHT && tool4 == 1 && hookDir == 0); 向右微调
+			add hookDeg, 2
+			invoke printf, offset tmp, hookDeg
+		.endif
+
+
+	.endif
+
+not_press:
+	popad
+	ret
+
+iface_keyboardEvent endp
+
+; 鼠标事件回调函数
 iface_mouseEvent proc C x:dword,y:dword,button:dword,event:dword
 	pushad; 将所有寄存器压入栈中，暂存寄存器的值
 	mov ecx,event
@@ -45,7 +138,7 @@ iface_mouseEvent proc C x:dword,y:dword,button:dword,event:dword
 	invoke printf,offset coord,x,y ;测试：打印用户点击的坐标
 
 	.if curWindow == 0; 在欢迎界面
-		invoke is_inside_the_rect,x,y,0,700,0,500; TODO 改成点击"开始"
+		invoke is_inside_the_rect,x,y,0,700,0,500;
 		.if eax == 1; 
 			; 窗体设为1
 			mov eax, 1
@@ -61,8 +154,9 @@ iface_mouseEvent proc C x:dword,y:dword,button:dword,event:dword
 		.if eax == 1; 在游戏区域，释放钩子。写hookStat，hookDir，hookV, lastHit
 			mov hookStat, 1
 			mov hookDir, 0
-			mov hookV, 35 ;(钩索默认速度)
+			mov hookV, 10 ;(钩索默认速度) TODO 原来是35
 			mov lastHit, -1
+			mov count, 0 ; 初始化count，由于矫正posX和posY
 			
 		.endif
 
@@ -94,6 +188,7 @@ iface_mouseEvent proc C x:dword,y:dword,button:dword,event:dword
 			.if playerScore > eax
 				sub playerScore, eax; 得分减少
 				mov tool2, 0 ; 购买
+				inc fireNum
 				invoke Flush; 刷新界面
 			.endif
 		.endif

@@ -99,6 +99,11 @@ public price3
 price4 dd 87
 public price4
 
+fireNum dd 0
+public fireNum
+
+count dd 0
+public count
 
 
 end

@@ -68,12 +68,13 @@ MoveHook proc C
 ChangePos: ;改变钩索位置
 	
 	;Step1.hookV送入ebx
-	.if hookDir == 1; 若hookDir为1，对ρ（极径，即hookV）取反
+	.if hookDir == 1; 若hookDir为1，向上移动，对ρ（极径，即hookV）取反
 		mov ebx, 0
 		mov ecx, hookV
 		sub ebx, ecx
-	.else
+	.else; 向下移动
 		mov ebx, hookV
+		inc count;
 	.endif
 
 	;Step2.PSin送入eax,并写hookPosX
@@ -214,8 +215,8 @@ IsOut proc C
 		mov hookPosY, eax
 		
 		.if lastHit != -1 ; 读lastHit，若不为-1，加分并删除物体
-			; 加分，写playerScore+=Items[lastHit].value
 			mov edi, lastHit
+			; 加分，写playerScore+=Items[lastHit].value
 			mov eax, Items[edi].value
 			add playerScore, eax;
 			; 删除物体，写Items[lastHit].exist为0
@@ -254,23 +255,27 @@ IsTimeOut proc C
 		invoke cancelTimer, 0  ; 取消定时器
 		mov eax, goalScore
 		.if playerScore >= eax; 过关
-			mov eax, 2
-			mov curWindow, eax; 切换到商店界面	
 			;重置tool们
 			mov tool1, 1
 			mov tool2, 1
 			mov tool3, 1
 			mov tool4, 1
+			mov eax, 2
+			mov curWindow, eax; 切换到商店界面	
 			invoke Flush; 绘制商店界面
-		.else ; 未过关 TODO
+		.else ; 未过关。这里需要实现与main中完全相同的全局游戏初始化.
+			;设置当前窗口为1
 			mov eax, 0
-			mov curWindow, eax;
-			; 重置得分
+			mov curWindow, eax
+			;重置得分
 			mov eax, 0
 			mov playerScore, eax; 
-			; 重置目标得分
+			;重置目标得分
 			mov eax, 0
 			mov goalScore, eax
+			;设置鞭炮数量
+			mov eax, 0
+			mov fireNum, eax
 			invoke Flush; 绘制欢迎界面
 		.endif
 	.endif
@@ -283,7 +288,9 @@ timer proc C id:dword
 	add timeElapsed, 100; 维护流逝的时间，单位ms
 	;invoke printf, OFFSET szFmt2, id , timeElapsed
 	invoke MoveHook; 移动钩索
-	invoke IsHit;
+	.if hookDir == 0; 仅在向下移动时调用IsHit
+		invoke IsHit;
+	.endif
 	invoke IsOut;
 	invoke printf, OFFSET szFmt7, hookStat, hookODir, hookDir, hookDeg, hookV, hookPosX, hookPosY
 	invoke Flush; 绘图主调函数
@@ -295,7 +302,9 @@ timer endp
 
 
 
-;@brief:初始化游戏，为一局游戏中用到的全局变量赋初值，注册并启动定时器。
+
+
+;@brief:初始化一局游戏，为一局游戏中用到的全局变量赋初值，注册并启动定时器。
 InitGame proc C
 	pushad
 
@@ -338,7 +347,7 @@ IniHook:
 	mov hookDir, eax; 设置hookDir, 初始化为0
 	mov eax, 5; 
 	mov hookOmega, eax; 设置角速度为2
-	mov eax, 35;
+	mov eax, 35; 
 	mov hookV, eax; 设置线速度（默认为35）
 
 	; B
