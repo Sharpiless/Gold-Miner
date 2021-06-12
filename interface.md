@@ -107,22 +107,6 @@ public tool5
 tool6 dd 1; 电动勾
 public tool6
 
-
-
-price1 dd 53
-public price1
-
-price2 dd 370
-public price2
-
-price3 dd 156
-public price3
-
-price4 dd 87
-public price4
-
-
-
 **商品功能介绍**
 
 石头收藏书：提高石头价值（石头价值*2）
@@ -136,10 +120,6 @@ public price4
 磁铁：可以吸住金子（金子的判定半径增加30）
 
 电动勾：可以控制钩子下降角度（使用←、→控制方向）
-
-
-
-
 
 
 
