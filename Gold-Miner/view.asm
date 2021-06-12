@@ -54,8 +54,11 @@ srcxpx byte "..\resource\icon\xpx.jpg", 0 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 srcdiamond byte "..\resource\icon\diamond.jpg", 0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 srcbigstone byte "..\resource\icon\bigstone.jpg", 0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 srcbag byte "..\resource\icon\bag.jpg", 0
-srcmagnet byte "..\resource\icon\magnet.jpg", 0
+srcmagnet byte "..\resource\icon\magnet.jpg", 0; 展示在商店中
 srcehook byte "..\resource\icon\ehook.jpg", 0
+srcmagnet1 byte "..\resource\icon\magnet1.jpg", 0; 展示在游戏中
+srcehook1 byte "..\resource\icon\ehook1.jpg", 0
+srcehookwithmagnet1 byte "..\resource\icon\ehookwithmagnet1.jpg", 0
 
 imgini ACL_Image <>
 imggame1 ACL_Image <>
@@ -73,15 +76,18 @@ imgbigstone ACL_Image <>;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 imgbag ACL_Image <>
 imgmagnet ACL_Image <>
 imgehook ACL_Image <>
+imgmagnet1 ACL_Image <>
+imgehook1 ACL_Image <>
+imgehookwithmagnet1 ACL_Image <>
 
 strrestTime byte "10",0
 strmusic byte "Music",0
-strprice1 byte "53",0
-strprice2 byte "370",0
-strprice3 byte "156",0
-strprice4 byte "87",0
-strprice5 byte "220",0
-strprice6 byte "270",0
+strprice1 byte 10 DUP(0) ;yyx改为使用itoa，根据price1得到
+strprice2 byte 10 DUP(0)
+strprice3 byte 10 DUP(0)
+strprice4 byte 10 DUP(0)
+strprice5 byte 10 DUP(0)
+strprice6 byte 10 DUP(0)
 strmenu byte "Menu",0
 strng byte "Next Game !",0
 strScore byte 10 DUP(0)
@@ -90,6 +96,8 @@ titleScore byte "得 分：", 0
 titleTime byte "时 间：", 0
 titleGoal byte "目 标 分 数：", 0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 strGoal byte 10 DUP(0);;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+strMulti byte "×", 0
+strFireNum byte 10 DUP(0)
 
 
 .code
@@ -173,6 +181,10 @@ mainwindow:
 	invoke loadImage, offset srcgame1, offset imggame1
 	invoke loadImage, offset srcdigger, offset imgdigger
 	invoke loadImage, offset srcxpx, offset imgxpx;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	invoke loadImage, offset srcmagnet1, offset imgmagnet1
+	invoke loadImage, offset srcehook1, offset imgehook1
+	invoke loadImage, offset srcehookwithmagnet1, offset imgehookwithmagnet1
+	invoke loadImage, offset srcfire, offset imgfire
 	;显示主界面
 	invoke beginPaint
 	invoke putImageScale, offset imggame1, 0, 0, 700, 500	;绘制背景
@@ -196,7 +208,7 @@ mainwindow:
 	pop edi
 	pop ebx
 	;画小螃蟹
-
+	;yyx改 根据购买情况画不同种类的钩子
 	.if hookStat==0
 		invoke calPSin, hookDeg, 30; Δx = -ρsinΘ
 		mov ebx,hookPosX
@@ -215,16 +227,25 @@ mainwindow:
 
 
 
-	push ebx;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	push eax;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	mov ebx,hookpy;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	mov eax,12;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	sub ebx,eax;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	push ebx
+	push eax
+	mov ebx,hookpy
+	mov eax,12
+	sub ebx,eax
 	mov eax,hookpx
 	add eax,80
-	invoke putImageScale, offset imgxpx, ebx, eax, 25, 25	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	pop eax;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	pop ebx;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	.if( tool5 == 0 && tool6 == 0 );
+		invoke putImageScale, offset imgehookwithmagnet1, ebx, eax, 25, 25
+	.elseif tool5 == 0;
+		invoke putImageScale, offset imgmagnet1, ebx, eax, 25, 25
+	.elseif tool6 == 0;
+		invoke putImageScale, offset imgehook1, ebx, eax, 25, 25
+	.else
+		invoke putImageScale, offset imgxpx, ebx, eax, 25, 25
+	.endif
+
+	pop eax
+	pop ebx
 
 	invoke setTextSize, 15
 	invoke setTextColor, 00cc9988h
@@ -250,10 +271,27 @@ mainwindow:
 	invoke setTextColor, 00cc9988h
 	invoke setTextBkColor, colorWHITE
 	invoke paintText, 60, 10, offset strTime	;显示剩余时间
+	
+	
+	invoke putImageScale, offset imgfire, 400, 20, 30, 30; 绘制鞭炮小图案
+	invoke setTextSize, 15
+	invoke setTextColor, 00cc9988h
+	invoke setTextBkColor, colorWHITE
+	invoke paintText, 430, 20, offset strMulti	;显示×
+	invoke setTextSize, 15
+	invoke setTextColor, 00cc9988h
+	invoke setTextBkColor, colorWHITE
+	mov ebx, fireNum
+	invoke myitoa, ebx, offset strFireNum
+	invoke paintText, 445, 20, offset strFireNum	;显示鞭炮数
+
+
+	
+	
+	; 画线
 	push eax
 	mov eax,hookpx
 	add eax,80
-
 	invoke line, hookpy, eax, 350, 80;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	pop eax
 	invoke setTextSize, 15;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -307,6 +345,8 @@ store:
 		invoke setTextSize, 20
 		invoke setTextColor, 00cc9988h
 		invoke setTextBkColor, colorWHITE
+		mov ebx, price1
+		invoke myitoa, ebx, offset strprice1
 		invoke paintText, 410, 220, offset strprice1
 	.endif
 	mov eax, tool2
@@ -315,6 +355,8 @@ store:
 		invoke setTextSize, 20
 		invoke setTextColor, 00cc9988h
 		invoke setTextBkColor, colorWHITE
+		mov ebx, price2
+		invoke myitoa, ebx, offset strprice2
 		invoke paintText, 350, 220, offset strprice2
 	.endif
 	mov eax, tool3
@@ -323,6 +365,8 @@ store:
 		invoke setTextSize, 20
 		invoke setTextColor, 00cc9988h
 		invoke setTextBkColor, colorWHITE
+		mov ebx, price3
+		invoke myitoa, ebx, offset strprice3
 		invoke paintText, 290, 220, offset strprice3
 	.endif
 	mov eax, tool4
@@ -331,6 +375,8 @@ store:
 		invoke setTextSize, 20
 		invoke setTextColor, 00cc9988h
 		invoke setTextBkColor, colorWHITE
+		mov ebx, price4
+		invoke myitoa, ebx, offset strprice4
 		invoke paintText, 230, 220, offset strprice4
 	.endif
 	mov eax, 1
@@ -340,6 +386,8 @@ store:
 		invoke setTextSize, 20
 		invoke setTextColor, 00cc9988h
 		invoke setTextBkColor, colorWHITE
+		mov ebx, price5
+		invoke myitoa, ebx, offset strprice5
 		invoke paintText, 170, 220, offset strprice5
 	.endif
 	
@@ -350,6 +398,8 @@ store:
 		invoke setTextSize, 20
 		invoke setTextColor, 00cc9988h
 		invoke setTextBkColor, colorWHITE
+		mov ebx, price6
+		invoke myitoa, ebx, offset strprice6
 		invoke paintText, 110, 220, offset strprice6
 	.endif
 	pop eax

@@ -22,19 +22,27 @@ Item STRUCT
 Item ENDS; 一个实例占4*7=28B
 extern Items:Item; vars中定义的物体数组
 
+extern tool5:dword; TODO extern语句放在这就能跑了
+extern tool6:dword
+
 printf PROTO C :ptr DWORD, :VARARG
 calDistance PROTO C :dword, :dword, :dword, :dword  ; 来自StaticLib1.lib，计算两点间距离
 calPSin PROTO C :dword, :dword ; 来自StaticLib1.lib，计算PSinθ
 calPCos PROTO C :dword, :dword ; 来自StaticLib1.lib，计算PCosθ
 
 .data
-modelMusicgot byte "..\resource\music\got.mp3", 0
-modelMusicset_xpx byte "..\resource\music\set_xpx.mp3", 0
 modelMusicgold byte "..\resource\music\gold.mp3", 0
+modelMusicstone byte "..\resource\music\stone.mp3", 0
+modelMusicbaganddiamond byte "..\resource\music\baganddiamond.mp3", 0
+modelMusicback byte "..\resource\music\back.mp3", 0
+modelMusicstartstore byte "..\resource\music\startstore.mp3", 0
 
-modelMusicgotP dd 0
-modelMusicset_xpxP dd 0
 modelMusicgoldP dd 0
+modelMusicstoneP dd 0
+modelMusicbaganddiamondP dd 0
+modelMusicbackP dd 0
+modelMusicstartstoreP dd 0
+
 
 hookODir DWORD ?; 角速度方向。1朝右，0朝左
 timeElapsed DWORD ?; 记录流逝时间（单位ms）
@@ -159,9 +167,8 @@ LoopTraverseItem:
 	.if Items[edi].exist == 1
 		invoke calDistance, hookPosX, hookPosY, Items[edi].posX, Items[edi].posY
 		mov ebx, Items[edi].radius
-		;.if ( tool6 == 0 && Items[edi].typ == 1);
-		.if Items[edi].typ == 1 ;拥有吸金石,金子半径+20
-			add ebx, 20
+		.if ( tool5 == 0 && Items[edi].typ == 1);拥有磁铁,金子半径+30
+			add ebx, 30
 		.endif
 		cmp eax, ebx; 比较大小
 		jb Hit; 距离小于半径，跳转到Hit。相当于break
@@ -178,8 +185,6 @@ LoopTraverseItem:
 Hit:
 	;invoke printf, OFFSET szFmt3, edi, eax, Items[edi].radius; 打印命中信息，eax是距离
 	; 写lastHit为命中物体的下标
-	invoke loadSound,addr modelMusicgot,addr modelMusicgotP
-	invoke playSound,modelMusicgotP,0
 	mov eax, edi
 	mov lastHit, eax
 	; 写hookDir为1
@@ -192,6 +197,18 @@ Hit:
 		mov eax, Items[edi].weight;
 		add hookV, eax
 	.endif
+
+	.if Items[edi].typ == 0
+		invoke loadSound,addr modelMusicstone,addr modelMusicstoneP
+		invoke playSound,modelMusicstoneP,0
+	.elseif Items[edi].typ == 1
+		invoke loadSound,addr modelMusicgold,addr modelMusicgoldP
+		invoke playSound,modelMusicgoldP,0
+	.else
+		invoke loadSound,addr modelMusicbaganddiamond,addr modelMusicbaganddiamondP
+		invoke playSound,modelMusicbaganddiamondP,0
+	.endif
+	
 	jmp Finish
 NotHit:
 	;invoke printf, OFFSET szFmt4; 打印未命中信息
@@ -236,8 +253,8 @@ IsOut proc C
 			; 删除物体，写Items[lastHit].exist为0
 			mov eax, 0
 			mov Items[edi].exist, eax 
-			invoke loadSound,addr modelMusicgold,addr modelMusicgoldP
-			invoke playSound,modelMusicgoldP,0
+			invoke loadSound,addr modelMusicback,addr modelMusicbackP
+			invoke playSound,modelMusicbackP,0
 		.endif
 
 	.elseif eax > gameX; 下出界,写hookDir为1
@@ -269,18 +286,21 @@ IsTimeOut proc C
 
 	.if restTime == 0; 时间结束，强制切换界面
 		invoke cancelTimer, 0  ; 取消定时器
+		;重置tool们
+		mov tool1, 1
+		mov tool2, 1
+		mov tool3, 1
+		mov tool4, 1
+		mov tool5, 1
+		mov tool6, 1
+
 		mov eax, goalScore
 		.if playerScore >= eax; 过关
-			;重置tool们
-			mov tool1, 1
-			mov tool2, 1
-			mov tool3, 1
-			mov tool4, 1
-			mov tool5, 1
-			mov tool6, 1
 			mov eax, 2
 			mov curWindow, eax; 切换到商店界面	
 			invoke Flush; 绘制商店界面
+			invoke loadSound,addr modelMusicstartstore,addr modelMusicstartstoreP
+			invoke playSound,modelMusicstartstoreP,0
 		.else ; 未过关。这里需要实现与main中完全相同的全局游戏初始化.
 			;设置当前窗口为1
 			mov eax, 0
@@ -335,14 +355,14 @@ IniGameSize:
 
 	; 初始化时间
 IniTime:
-	mov eax, 30
+	mov eax, 30;
 	mov restTime, eax; 剩余时间30s
 	mov eax, 0
 	mov timeElapsed, 0;  流逝时间
 
 	; 初始化得分
 IniScore:
-	add goalScore, 50; 目标得分在上一关的基础上增加500
+	add goalScore, 500; 目标得分在上一关的基础上增加500
 
 
 	; 初始化矿工
@@ -378,23 +398,6 @@ IniHook:
 	mov hookPosY, eax; 设置hookPosY（即矿工位置y坐标）
 
 
-	;测试：向物体列表中某个元素赋值。实际中替换为随机初始化物体列表。(成功)
-;IniItem:
-	;mov edi, 0; 数组偏移，开始设为0
-	;mov eax, 1; 
-	;mov Items[edi].exist, eax; 设置第一个物体的exist是1。由于exist字段占四个字节，所以源操作数是eax。
-	;mov eax, 0; 
-	;mov Items[edi].typ, eax; 设置typ
-	;mov eax, 350;
-	;mov Items[edi].posX, eax; 设置位置
-	;mov Items[edi].posY, eax;
-	;mov eax, 30;
-	;mov Items[edi].radius, eax; 设置半径为15
-	;mov eax, 10;
-	;mov Items[edi].weight, eax; 设置重量为10
-	;mov Items[edi].value, eax; 设置价值为10
-	;invoke	printf, OFFSET szFmt1, edi, Items[edi].exist, Items[edi].typ, Items[edi].posX, Items[edi].posY, Items[edi].radius, Items[edi].weight, Items[edi].value; 打印查看赋值是否成功。
-	;end测试
 
 	; 随机初始化物体列表
 	; 用时间作为随机数种子
@@ -408,15 +411,9 @@ IniHook:
 	mov edi, 0; 数组偏移初值
 RandLoop:
 
-	;edi*28作为偏移量，存入ecx，取结构体数组中第edi个元素。
-	;mov eax, edi;
-	;mov ecx, 28;
-	;mul ecx;
-	;mov ecx, eax;
 
-	; exist属性赋为1
+	; 设置exist属性1
 	mov eax, 1
-	;mov Items[ecx].exist, eax
 	mov Items[edi].exist, eax
 
 	invoke crt_rand; 函数返回随机数存在eax中
@@ -424,6 +421,7 @@ RandLoop:
 	mov ebx, 10;
 	div ebx; 余数0~9放在edx中
 
+	; 设置物体类别
 	.if edx < 3; 0.3概率为石头
 		mov eax, 0
 		mov Items[edi].typ, eax
@@ -440,10 +438,23 @@ RandLoop:
 		.endif
 	.endif
 
+	.if tool4 == 0; 拥有幸运草，出现福袋的概率提升为33%
+		invoke crt_rand; 函数返回随机数存在eax中
+		mov edx, 0; 
+		mov ebx, 100;
+		div ebx; 
+		.if edx < 26; 0.1 + 0.9*0.26 = 0.33
+			mov eax, 3; 0.1概率为福袋
+			mov Items[edi].typ, eax
+		.endif
+	.endif
+
+	; 设置物体的位置 yyx改，posX范围改为[100,420]
 	invoke crt_rand
 	mov edx, 0
-	mov ebx, 420; PosX的上限
+	mov ebx, 320; PosX的上限
 	div ebx; 余数存放在edx中
+	add edx, 100
 	mov Items[edi].posX, edx
 
 	invoke crt_rand
@@ -556,41 +567,11 @@ RandLoop:
 	jne RandLoop  ; 循环未结束，进行下一轮循环
 
 
-	;测试：随机初始化是否正确
-	;mov edi, 0; 数组偏移初值
-;Test1:
-	;invoke printf, OFFSET szFmt8, edi, Items[edi].posX, Items[edi].posY, Items[edi].radius, Items[edi].typ; 测试结果
-	;add edi, 28; 增加数组下标。注意现在加的是28，一个结构体元素的大小
-	;mov eax, itemNum
-	;mov ebx, 28;
-	;mul ebx;
-	;cmp edi, eax; 检查循环是否结束
-	;jne Test1  ; 循环未结束，进行下一轮循环
-	;end测试
-
-	
-
-	;测试：手动调用MoveHook移动。
-	;invoke MoveHook
-	;end测试
-
-	;测试：手动调用isHit和isOut
-	;invoke IsHit
-	;invoke IsOut
-	;end测试
-
-	;测试：注册并启动定时器。（成功，当阻塞在main中的init_second时，定时器工作）
+	;注册并启动定时器。（当阻塞在main中的init_second时，定时器工作）
 	invoke registerTimerEvent, offset timer  ;注册定时器回调函数timer
 	invoke startTimer, 0, 100  ; 定时器编号为0，刷新间隔为100ms
-	;end测试
 
 
-	;测试：阻塞在一个空循环中，直到时间流逝1s。（不成功）
-;LoopTest:
-	;mov eax, timeElapsed
-	;cmp eax, 1000
-	;jb LoopTest;
-	;end测试
 
 	popad
 	ret

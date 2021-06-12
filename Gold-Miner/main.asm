@@ -24,7 +24,7 @@ winTitle byte "黄金矿工", 0
 szFmt5 BYTE '断点...', 0ah, 0
 
 Item STRUCT
-	exist DWORD ?; 1存在，0已不存在（得分）
+	exist DWORD ?; 1存在，0已不存在
 	typ DWORD ?; 类别
 	posX DWORD ?; 位置横坐标
 	posY DWORD ?; 位置纵坐标
@@ -48,7 +48,7 @@ main proc;
 	mov eax, 0
 	mov curWindow, eax
 	;重置得分
-	mov eax, 1000; TODO
+	mov eax, 0;
 	mov playerScore, eax; 
 	;重置目标得分
 	mov eax, 0

@@ -11818,8 +11818,8 @@ MODEMSETTINGS STRUCT
   dwSpeakerVolume           DWORD      ?
   dwSpeakerMode             DWORD      ?
   dwPreferredModemOptions   DWORD      ?
-  dwNegotiatedModemOptions  DWORD      ?
-  dwNegotiatedDCERate       DWORD      ?
+  dwNegoldiatedModemOptions  DWORD      ?
+  dwNegoldiatedDCERate       DWORD      ?
   abVariablePortion         BYTE       ?
 MODEMSETTINGS ENDS
 

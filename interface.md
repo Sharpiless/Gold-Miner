@@ -94,17 +94,18 @@ B：
 
 ### 商店
 
-tool1 dd 1石头收藏书
+tool1 dd 1; 石头收藏书
 public tool1
-
-tool2 dd 1鞭炮
+tool2 dd 1; 鞭炮
 public tool2
-
-tool3 dd 1神水
+tool3 dd 1; 神水
 public tool3
-
-tool4 dd 1幸运草
+tool4 dd 1; 幸运草
 public tool4
+tool5 dd 1; 磁铁
+public tool5
+tool6 dd 1; 电动勾
+public tool6
 
 
 
@@ -122,9 +123,21 @@ public price4
 
 
 
-石头收藏书：石头的价值*2。
+**商品功能介绍**
 
-神水：抓住物品后的速度*2。
+石头收藏书：提高石头价值（石头价值*2）
+
+鞭炮：不必多说，空格释放
+
+神水：提高拉回速度（拉回速度*2）
+
+幸运草：提高福袋出现概率（由10%提升为33%）
+
+磁铁：可以吸住金子（金子的判定半径增加30）
+
+电动勾：可以控制钩子下降角度（使用←、→控制方向）
+
+
 
 
 

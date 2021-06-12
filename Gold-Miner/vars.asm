@@ -81,31 +81,31 @@ itemNum DWORD 10; 物体数量
 public itemNum
 
 ;商店
-tool1 dd 1
+tool1 dd 1; 石头收藏书
 public tool1
-tool2 dd 1
+tool2 dd 1; 鞭炮
 public tool2
-tool3 dd 1
+tool3 dd 1; 神水
 public tool3
-tool4 dd 1
+tool4 dd 1; 幸运草
 public tool4
-tool5 dd 1
+tool5 dd 1; 磁铁
 public tool5
-tool6 dd 1
+tool6 dd 1; 电动勾
 public tool6
 
 
-price1 dd 53
+price1 dd 20
 public price1
-price2 dd 370
+price2 dd 100
 public price2
-price3 dd 156
+price3 dd 150
 public price3
-price4 dd 87
+price4 dd 150
 public price4
-price5 dd 220
+price5 dd 100
 public price5
-price6 dd 270
+price6 dd 300
 public price6
 
 

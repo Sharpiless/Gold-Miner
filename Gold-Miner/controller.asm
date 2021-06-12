@@ -33,7 +33,14 @@ calPCos PROTO C :dword, :dword ; 来自StaticLib1.lib，计算PCosθ
 .data
 
 modelMusicset_xpx byte "..\resource\music\set_xpx.mp3", 0
-modelMusicset_xpxP dd 1
+modelMusicboomb byte "..\resource\music\boomb.mp3", 0
+modelMusicstartgame byte "..\resource\music\startgame.mp3", 0
+
+modelMusicset_xpxP dd 0
+modelMusicboombP dd 0
+modelMusicstartgameP dd 0
+
+
 
 coord sbyte "鼠标点击 %d,%d",0ah,0
 strSpace sbyte "按下空格", 0ah, 0
@@ -89,9 +96,12 @@ iface_keyboardEvent proc C key:dword, event:dword
 			mov edi, lastHit
 			mov eax, 0
 			mov Items[edi].exist, eax 
+
+			invoke loadSound,addr modelMusicboomb,addr modelMusicboombP
+			invoke playSound,modelMusicboombP,0
 		.endif
 
-		.if ((key == VK_LEFT || key == VK_RIGHT) && tool5 == 0 && hookDir == 0); 微调 tool5==0
+		.if ((key == VK_LEFT || key == VK_RIGHT) && tool6 == 0 && hookDir == 0); 微调 tool6==0
 			.if key == VK_LEFT; 向左
 				invoke printf, offset strLeft
 				sub hookDeg, 2	
@@ -144,7 +154,8 @@ iface_mouseEvent proc C x:dword,y:dword,button:dword,event:dword
 			mov eax, 1
 			mov curWindow, eax
 			invoke InitGame
-			
+			invoke loadSound,addr modelMusicstartgame,addr modelMusicstartgameP
+			invoke playSound,modelMusicstartgameP,0
 		.endif
 		
 	.elseif curWindow == 1; 在游戏界面
@@ -154,12 +165,39 @@ iface_mouseEvent proc C x:dword,y:dword,button:dword,event:dword
 		.if eax == 1; 在游戏区域，释放钩子。写hookStat，hookDir，hookV, lastHit
 			mov hookStat, 1
 			mov hookDir, 0
-			mov hookV, 35 ;(钩索默认速度) TODO 原来是35
+			mov hookV, 35 ;(钩索默认速度)
 			mov lastHit, -1
-			mov count, 0 ; 初始化count，由于矫正posX和posY
+			mov count, 0 ; 初始化count，用于矫正posX和posY
 			invoke loadSound,addr modelMusicset_xpx,addr modelMusicset_xpxP
 			invoke playSound,modelMusicset_xpxP,0
 		.endif
+
+		invoke is_inside_the_rect,x,y,630,700,30,45; 点击第一个商品，石头收藏书
+		;矩形范围：630，30，？，15
+		.if eax == 1; 点击菜单，回到欢迎界面
+			;重置tool们
+			mov tool1, 1
+			mov tool2, 1
+			mov tool3, 1
+			mov tool4, 1
+			mov tool5, 1
+			mov tool6, 1
+			;设置当前窗口为1
+			mov eax, 0
+			mov curWindow, eax
+			;重置得分
+			mov eax, 0
+			mov playerScore, eax; 
+			;重置目标得分
+			mov eax, 0
+			mov goalScore, eax
+			;设置鞭炮数量
+			mov eax, 0
+			mov fireNum, eax
+			invoke Flush; 绘制欢迎界面
+		.endif
+
+
 
 	.elseif curWindow == 2; 在商店
 		invoke is_inside_the_rect,x,y,200,700,350,400; 点击"next game"区域
@@ -169,6 +207,8 @@ iface_mouseEvent proc C x:dword,y:dword,button:dword,event:dword
 			mov eax, 1
 			mov curWindow, eax
 			invoke InitGame
+			invoke loadSound,addr modelMusicstartgame,addr modelMusicstartgameP
+			invoke playSound,modelMusicstartgameP,0
 		.endif
 
 		invoke is_inside_the_rect,x,y,400,460,150,210 ; 点击第一个商品，石头收藏书
@@ -180,6 +220,8 @@ iface_mouseEvent proc C x:dword,y:dword,button:dword,event:dword
 				mov tool1, 0 ; 购买
 				invoke Flush; 刷新界面
 			.endif
+			invoke loadSound,addr modelMusicset_xpx,addr modelMusicset_xpxP
+			invoke playSound,modelMusicset_xpxP,0
 		.endif
 
 		invoke is_inside_the_rect,x,y,340,400,150,210 ; 点击第二个商品，鞭炮
@@ -192,6 +234,8 @@ iface_mouseEvent proc C x:dword,y:dword,button:dword,event:dword
 				inc fireNum
 				invoke Flush; 刷新界面
 			.endif
+			invoke loadSound,addr modelMusicset_xpx,addr modelMusicset_xpxP
+			invoke playSound,modelMusicset_xpxP,0
 		.endif
 
 		invoke is_inside_the_rect,x,y,280,340,150,210 ; 点击第三个商品，神水
@@ -203,6 +247,8 @@ iface_mouseEvent proc C x:dword,y:dword,button:dword,event:dword
 				mov tool3, 0 ; 购买
 				invoke Flush; 刷新界面
 			.endif
+			invoke loadSound,addr modelMusicset_xpx,addr modelMusicset_xpxP
+			invoke playSound,modelMusicset_xpxP,0
 		.endif
 
 		invoke is_inside_the_rect,x,y,220,280,150,210 ; 点击第四个商品，幸运草
@@ -214,9 +260,11 @@ iface_mouseEvent proc C x:dword,y:dword,button:dword,event:dword
 				mov tool4, 0 ; 购买
 				invoke Flush; 刷新界面
 			.endif
+			invoke loadSound,addr modelMusicset_xpx,addr modelMusicset_xpxP
+			invoke playSound,modelMusicset_xpxP,0
 		.endif
 
-		invoke is_inside_the_rect,x,y,160,220,150,210 ;TODO 点击第五个商品，电动勾
+		invoke is_inside_the_rect,x,y,160,220,150,210 ;TODO 点击第五个商品，磁铁
 		.if eax == 1
 			mov eax, price5
 			.if playerScore > eax
@@ -224,9 +272,11 @@ iface_mouseEvent proc C x:dword,y:dword,button:dword,event:dword
 				mov tool5, 0 ; 购买
 				invoke Flush; 刷新界面
 			.endif
+			invoke loadSound,addr modelMusicset_xpx,addr modelMusicset_xpxP
+			invoke playSound,modelMusicset_xpxP,0
 		.endif
 
-		invoke is_inside_the_rect,x,y,100,160,150,210 ;TODO 点击第六个商品，磁铁
+		invoke is_inside_the_rect,x,y,100,160,150,210 ;TODO 点击第六个商品，电动勾
 
 		.if eax == 1
 			mov eax, price6
@@ -235,6 +285,8 @@ iface_mouseEvent proc C x:dword,y:dword,button:dword,event:dword
 				mov tool6, 0 ; 购买
 				invoke Flush; 刷新界面
 			.endif
+			invoke loadSound,addr modelMusicset_xpx,addr modelMusicset_xpxP
+			invoke playSound,modelMusicset_xpxP,0
 		.endif
 
 
