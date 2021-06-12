@@ -435,9 +435,9 @@ RandLoop:
 
 		invoke crt_rand
 		mov edx, 0
-		mov ebx, 11
+		mov ebx, 10
 		div ebx
-		inc ebx
+		add ebx, 3
 		mov Items[edi].weight, ebx
 
 		invoke crt_rand
