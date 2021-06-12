@@ -21,7 +21,7 @@ colorWHITE EQU 00ffffffh
 colorEMPTY EQU 0ffffffffh
 
 Item STRUCT
-	exist DWORD ?; 1存在，0已不存在（得分）
+	exist DWORD ?; 1存在，0已不存在
 	typ DWORD ?; 类别
 	posX DWORD ?; 位置横坐标
 	posY DWORD ?; 位置纵坐标
@@ -49,8 +49,9 @@ srcgold byte "..\resource\icon\gold.jpg", 0
 srcxpx byte "..\resource\icon\xpx.jpg", 0 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 srcdiamond byte "..\resource\icon\diamond.jpg", 0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 srcbigstone byte "..\resource\icon\bigstone.jpg", 0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
+srcbag byte "..\resource\icon\bag.jpg", 0
+srcmagnet byte "..\resource\icon\magnet.jpg", 0
+srcehook byte "..\resource\icon\ehook.jpg", 0
 
 imgini ACL_Image <>
 imggame1 ACL_Image <>
@@ -65,8 +66,9 @@ imggold ACL_Image <>
 imgxpx ACL_Image <> ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 imgdiamond ACL_Image <>;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 imgbigstone ACL_Image <>;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
+imgbag ACL_Image <>
+imgmagnet ACL_Image <>
+imgehook ACL_Image <>
 
 strrestTime byte "10",0
 strmusic byte "Music",0
@@ -74,6 +76,8 @@ strprice1 byte "53",0
 strprice2 byte "370",0
 strprice3 byte "156",0
 strprice4 byte "87",0
+strprice5 byte "220",0
+strprice6 byte "270",0
 strmenu byte "Menu",0
 strng byte "Next Game !",0
 strScore byte 10 DUP(0)
@@ -129,6 +133,9 @@ DrawItem proc C x: dword, y: dword, r: dword, t: dword		;只能在启动了paint时调用
 	.elseif eax==2 ; 钻石
 		invoke loadImage, offset srcdiamond, offset imgdiamond;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		invoke putImageScale, offset imgdiamond, y, x, r, r;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	.elseif eax==3 ; 幸运袋
+		invoke loadImage, offset srcbag, offset imgbag;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+		invoke putImageScale, offset imgbag, y, x, r, r;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	.endif
 	pop eax
 	ret
@@ -278,6 +285,9 @@ store:
 	invoke loadImage, offset srcstrengthwater, offset imgstrengthwater
 	invoke loadImage, offset srcfire, offset imgfire
 	invoke loadImage, offset srcwords, offset imgwords;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	invoke loadImage, offset srcmagnet, offset imgmagnet
+	invoke loadImage, offset srcehook, offset imgehook
+
 	;显示主界面
 	invoke beginPaint
 	invoke putImageScale, offset imggame1, 0, 0, 700, 500
@@ -288,35 +298,54 @@ store:
 	push eax
 	mov eax, tool1
 	.if eax == 1			;如果tool1==1则显示商品1
-		invoke putImageScale, offset imgstonebook, 400, 150, 80, 80
+		invoke putImageScale, offset imgstonebook, 400, 150, 60, 60
 		invoke setTextSize, 20
 		invoke setTextColor, 00cc9988h
 		invoke setTextBkColor, colorWHITE
-		invoke paintText, 430, 250, offset strprice1
+		invoke paintText, 410, 220, offset strprice1
 	.endif
 	mov eax, tool2
 	.if eax == 1
-		invoke putImageScale, offset imgfire, 300, 150, 80, 80
+		invoke putImageScale, offset imgfire, 340, 150, 60, 60
 		invoke setTextSize, 20
 		invoke setTextColor, 00cc9988h
 		invoke setTextBkColor, colorWHITE
-		invoke paintText, 330, 250, offset strprice2
+		invoke paintText, 350, 220, offset strprice2
 	.endif
 	mov eax, tool3
 	.if eax == 1
-		invoke putImageScale, offset imgstrengthwater, 200, 150, 80, 80
+		invoke putImageScale, offset imgstrengthwater, 280, 150, 60, 60
 		invoke setTextSize, 20
 		invoke setTextColor, 00cc9988h
 		invoke setTextBkColor, colorWHITE
-		invoke paintText, 230, 250, offset strprice3
+		invoke paintText, 290, 220, offset strprice3
 	.endif
 	mov eax, tool4
 	.if eax == 1
-		invoke putImageScale, offset imgluckyleave, 100, 150, 80, 80
+		invoke putImageScale, offset imgluckyleave, 220, 150, 60, 60
 		invoke setTextSize, 20
 		invoke setTextColor, 00cc9988h
 		invoke setTextBkColor, colorWHITE
-		invoke paintText, 130, 250, offset strprice4
+		invoke paintText, 230, 220, offset strprice4
+	.endif
+	mov eax, 1
+	;.if eax == 1
+	.if eax == tool5
+		invoke putImageScale, offset imgmagnet, 160, 150, 60, 60
+		invoke setTextSize, 20
+		invoke setTextColor, 00cc9988h
+		invoke setTextBkColor, colorWHITE
+		invoke paintText, 170, 220, offset strprice5
+	.endif
+	
+	mov eax, 1
+	;.if eax == 1
+	.if eax == tool6
+		invoke putImageScale, offset imgehook, 100, 150, 60, 60
+		invoke setTextSize, 20
+		invoke setTextColor, 00cc9988h
+		invoke setTextBkColor, colorWHITE
+		invoke paintText, 110, 220, offset strprice6
 	.endif
 	pop eax
 	invoke setTextSize, 15

@@ -65,7 +65,7 @@ public lastHit
 
 ;把结构体Item的定义放在vars中，并将Items设置为public。注意：所有要使用Items的程序，必须对Item结构体再进行一次定义。
 Item STRUCT
-	exist DWORD ?; 1存在，0已不存在（得分）
+	exist DWORD ?; 1存在，0已不存在
 	typ DWORD ?; 类别
 	posX DWORD ?; 位置横坐标
 	posY DWORD ?; 位置纵坐标
@@ -89,6 +89,11 @@ tool3 dd 1
 public tool3
 tool4 dd 1
 public tool4
+tool5 dd 1
+public tool5
+tool6 dd 1
+public tool6
+
 
 price1 dd 53
 public price1
@@ -98,6 +103,11 @@ price3 dd 156
 public price3
 price4 dd 87
 public price4
+price5 dd 220
+public price5
+price6 dd 270
+public price6
+
 
 fireNum dd 0
 public fireNum

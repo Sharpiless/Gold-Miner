@@ -4,15 +4,14 @@ option casemap:none
 
 includelib msvcrt.lib
 includelib acllib.lib
-includelib StaticLib1.lib
-include include\test.inc
+
 include include\vars.inc
 include include\model.inc
 include include\acllib.inc
 include include\view.inc
 
 Item STRUCT
-	exist DWORD ?; 1存在，0已不存在（得分）
+	exist DWORD ?; 1存在，0已不存在
 	typ DWORD ?; 类别
 	posX DWORD ?; 位置横坐标
 	posY DWORD ?; 位置纵坐标
@@ -29,6 +28,9 @@ calPCos PROTO C :dword, :dword ; 来自StaticLib1.lib，计算PCosθ
 
 .data
 
+modelMusicset_xpx byte "..\resource\music\set_xpx.mp3", 0
+modelMusicset_xpxP dd 1
+
 coord sbyte "鼠标点击：%d,%d",0ah,0
 strSpace sbyte "按下空格", 0ah, 0
 strLeft sbyte "按下向左", 0ah, 0
@@ -38,6 +40,8 @@ str1 byte "count=%d", 0ah, 0
 str2 byte "count*hookV=%d", 0ah, 0
 
 tmpVar dd 0
+
+
 
 
 .code
@@ -88,7 +92,7 @@ iface_keyboardEvent proc C key:dword, event:dword
 			mov Items[edi].exist, eax 
 		.endif
 
-		.if (key == VK_LEFT && tool4 == 1 && hookDir == 0); 向左微调
+		.if (key == VK_LEFT && tool5 == 0 && hookDir == 0); 向左微调 ;tool5
 			invoke printf, offset strLeft
 			invoke printf, offset str1, count
 			sub hookDeg, 2
@@ -114,7 +118,7 @@ iface_keyboardEvent proc C key:dword, event:dword
 			invoke printf, offset tmp, hookDeg
 		.endif
 
-		.if (key == VK_RIGHT && tool4 == 1 && hookDir == 0); 向右微调
+		.if (key == VK_RIGHT && tool5 == 0 && hookDir == 0); 向右微调
 			add hookDeg, 2
 			invoke printf, offset tmp, hookDeg
 		.endif
@@ -154,10 +158,11 @@ iface_mouseEvent proc C x:dword,y:dword,button:dword,event:dword
 		.if eax == 1; 在游戏区域，释放钩子。写hookStat，hookDir，hookV, lastHit
 			mov hookStat, 1
 			mov hookDir, 0
-			mov hookV, 10 ;(钩索默认速度) TODO 原来是35
+			mov hookV, 35 ;(钩索默认速度) TODO 原来是35
 			mov lastHit, -1
 			mov count, 0 ; 初始化count，由于矫正posX和posY
-			
+			invoke loadSound,addr modelMusicset_xpx,addr modelMusicset_xpxP
+			invoke playSound,modelMusicset_xpxP,0
 		.endif
 
 	.elseif curWindow == 2; 在商店
@@ -170,7 +175,7 @@ iface_mouseEvent proc C x:dword,y:dword,button:dword,event:dword
 			invoke InitGame
 		.endif
 
-		invoke is_inside_the_rect,x,y,400,480,150,230 ; 点击第一个商品，石头收藏书
+		invoke is_inside_the_rect,x,y,400,460,150,210 ; 点击第一个商品，石头收藏书
 		;矩形范围：400，150，80，80
 		.if eax == 1
 			mov eax, price1
@@ -181,7 +186,7 @@ iface_mouseEvent proc C x:dword,y:dword,button:dword,event:dword
 			.endif
 		.endif
 
-		invoke is_inside_the_rect,x,y,300,380,150,230 ; 点击第二个商品，炸药
+		invoke is_inside_the_rect,x,y,340,400,150,210 ; 点击第二个商品，鞭炮
 		;矩形范围：300，150，80，80
 		.if eax == 1
 			mov eax, price2
@@ -193,7 +198,7 @@ iface_mouseEvent proc C x:dword,y:dword,button:dword,event:dword
 			.endif
 		.endif
 
-		invoke is_inside_the_rect,x,y,200,280,150,230 ; 点击第三个商品，神水
+		invoke is_inside_the_rect,x,y,280,340,150,210 ; 点击第三个商品，神水
 		;矩形范围：200，150，80，80
 		.if eax == 1
 			mov eax, price3
@@ -204,7 +209,7 @@ iface_mouseEvent proc C x:dword,y:dword,button:dword,event:dword
 			.endif
 		.endif
 
-		invoke is_inside_the_rect,x,y,100,180,150,230 ; 点击第四个商品，幸运草
+		invoke is_inside_the_rect,x,y,220,280,150,210 ; 点击第四个商品，幸运草
 		;矩形范围：100，150，80，80
 		.if eax == 1
 			mov eax, price4
@@ -214,6 +219,29 @@ iface_mouseEvent proc C x:dword,y:dword,button:dword,event:dword
 				invoke Flush; 刷新界面
 			.endif
 		.endif
+
+		invoke is_inside_the_rect,x,y,160,220,150,210 ;TODO 点击第五个商品，电动勾
+		.if eax == 1
+			mov eax, price5
+			.if playerScore > eax
+				sub playerScore, eax; 得分减少
+				;mov tool4, 0 ; 购买
+				invoke Flush; 刷新界面
+			.endif
+		.endif
+
+		invoke is_inside_the_rect,x,y,100,160,150,210 ;TODO 点击第六个商品，磁铁
+
+		.if eax == 1
+			mov eax, price6
+			.if playerScore > eax
+				sub playerScore, eax; 得分减少
+				;mov tool4, 0 ; 购买
+				invoke Flush; 刷新界面
+			.endif
+		.endif
+
+
 	
 	.endif
 					

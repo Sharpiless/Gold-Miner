@@ -28,10 +28,16 @@ extern tool1:dword
 extern tool2:dword
 extern tool3:dword
 extern tool4:dword
+extern tool5:dword
+extern tool6:dword
+
 extern price1:dword
 extern price2:dword
 extern price3:dword
 extern price4:dword
+extern price5:dword
+extern price6:dword
+
 extern fireNum:dword
 
 extern count:dword

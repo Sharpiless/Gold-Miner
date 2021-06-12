@@ -35,9 +35,6 @@
     <None Include="include\vars.inc">
       <Filter>头文件</Filter>
     </None>
-    <None Include="include\test.inc">
-      <Filter>头文件</Filter>
-    </None>
     <None Include="include\model.inc">
       <Filter>头文件</Filter>
     </None>

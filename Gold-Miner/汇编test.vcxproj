@@ -164,7 +164,6 @@
     <None Include="include\controller.inc" />
     <None Include="include\model.inc" />
     <None Include="include\msvcrt.inc" />
-    <None Include="include\test.inc" />
     <None Include="include\vars.inc" />
     <None Include="include\view.inc" />
     <None Include="include\windows.inc" />

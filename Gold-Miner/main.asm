@@ -5,7 +5,7 @@ option casemap:none
 includelib msvcrt.lib
 includelib acllib.lib
 
-include include\test.inc
+
 include include\vars.inc
 include include\windows.inc
 include include\model.inc
@@ -48,7 +48,7 @@ main proc;
 	mov eax, 0
 	mov curWindow, eax
 	;重置得分
-	mov eax, 0
+	mov eax, 1000; TODO
 	mov playerScore, eax; 
 	;重置目标得分
 	mov eax, 0

@@ -12,7 +12,7 @@ include include\msvcrt.inc
 include include\view.inc
 
 Item STRUCT
-	exist DWORD ?; 1存在，0已不存在（得分）
+	exist DWORD ?; 1存在，0已不存在
 	typ DWORD ?; 类别
 	posX DWORD ?; 位置横坐标
 	posY DWORD ?; 位置纵坐标
@@ -28,6 +28,13 @@ calPSin PROTO C :dword, :dword ; 来自StaticLib1.lib，计算PSinθ
 calPCos PROTO C :dword, :dword ; 来自StaticLib1.lib，计算PCosθ
 
 .data
+modelMusicgot byte "..\resource\music\got.mp3", 0
+modelMusicset_xpx byte "..\resource\music\set_xpx.mp3", 0
+modelMusicgold byte "..\resource\music\gold.mp3", 0
+
+modelMusicgotP dd 0
+modelMusicset_xpxP dd 0
+modelMusicgoldP dd 0
 
 hookODir DWORD ?; 角速度方向。1朝右，0朝左
 timeElapsed DWORD ?; 记录流逝时间（单位ms）
@@ -166,6 +173,8 @@ LoopTraverseItem:
 Hit:
 	;invoke printf, OFFSET szFmt3, edi, eax, Items[edi].radius; 打印命中信息，eax是距离
 	; 写lastHit为命中物体的下标
+	invoke loadSound,addr modelMusicgot,addr modelMusicgotP
+	invoke playSound,modelMusicgotP,0
 	mov eax, edi
 	mov lastHit, eax
 	; 写hookDir为1
@@ -222,6 +231,8 @@ IsOut proc C
 			; 删除物体，写Items[lastHit].exist为0
 			mov eax, 0
 			mov Items[edi].exist, eax 
+			invoke loadSound,addr modelMusicgold,addr modelMusicgoldP
+			invoke playSound,modelMusicgoldP,0
 		.endif
 
 	.elseif eax > gameX; 下出界,写hookDir为1
@@ -413,7 +424,7 @@ RandLoop:
 		.if edx < 8; 0.5概率为金块
 			mov eax, 1
 			mov Items[edi].typ, eax
-		.elseif edx < 9:
+		.elseif edx < 9
 			mov eax, 2; 0.1概率为钻石
 			mov Items[edi].typ, eax
 		.else
@@ -436,7 +447,7 @@ RandLoop:
 
 	; 设置物体的半径、重量、价值，需要先判断物体类别
 
-	mov ebx, Item[edi].typ
+	mov ebx, Items[edi].typ
 	.if ebx == 3; 福袋
 
 		mov eax, 20
@@ -447,14 +458,14 @@ RandLoop:
 		mov ebx, 10
 		div ebx
 		add ebx, 3
-		mov Items[edi].weight, ebx
+		mov Items[edi].weight, edx
 
 		invoke crt_rand
 		mov edx, 0
 		mov ebx, 1200
 		div ebx
 		add ebx, 10
-		mov Item[edi].value, ebx
+		mov Items[edi].value, edx
 
 	.endif
 	mov ebx, Items[edi].typ
