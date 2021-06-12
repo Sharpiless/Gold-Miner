@@ -362,7 +362,7 @@ IniTime:
 
 	; 初始化得分
 IniScore:
-	add goalScore, 500; 目标得分在上一关的基础上增加500
+	add goalScore, 400; 目标得分在上一关的基础上增加400
 
 
 	; 初始化矿工
@@ -473,16 +473,16 @@ RandLoop:
 
 		invoke crt_rand
 		mov edx, 0
-		mov ebx, 10
+		mov ebx, 5
 		div ebx
-		add ebx, 3
+		add edx, 5
 		mov Items[edi].weight, edx
 
 		invoke crt_rand
 		mov edx, 0
 		mov ebx, 1200
 		div ebx
-		add ebx, 10
+		add edx, 10
 		mov Items[edi].value, edx
 
 	.endif

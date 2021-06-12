@@ -105,7 +105,7 @@ price4 dd 150
 public price4
 price5 dd 100
 public price5
-price6 dd 300
+price6 dd 200
 public price6
 
 
