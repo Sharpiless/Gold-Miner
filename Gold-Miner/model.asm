@@ -404,8 +404,11 @@ RandLoop:
 		.if edx < 8; 0.5概率为金块
 			mov eax, 1
 			mov Items[edi].typ, eax
+		.elseif edx < 9:
+			mov eax, 2; 0.1概率为钻石
+			mov Items[edi].typ, eax
 		.else
-			mov eax, 2; 0.2概率为钻石
+			mov eax, 3; 0.1概率为福袋
 			mov Items[edi].typ, eax
 		.endif
 	.endif
@@ -423,6 +426,28 @@ RandLoop:
 	mov Items[edi].posY, edx
 
 	; 设置物体的半径、重量、价值，需要先判断物体类别
+
+	mov ebx, Item[edi].typ
+	.if ebx == 3; 福袋
+
+		mov eax, 20
+		mov Items[edi].radius, eax
+
+		invoke crt_rand
+		mov edx, 0
+		mov ebx, 11
+		div ebx
+		inc ebx
+		mov Items[edi].weight, ebx
+
+		invoke crt_rand
+		mov edx, 0
+		mov ebx, 1200
+		div ebx
+		add ebx, 10
+		mov Item[edi].value, ebx
+
+	.endif
 	mov ebx, Items[edi].typ
 	.if ebx == 2; 钻石
 		mov eax, 20
