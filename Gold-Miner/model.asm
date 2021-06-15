@@ -89,7 +89,7 @@ ChangePos: ;改变钩索位置
 		sub ebx, ecx
 	.else; 向下移动
 		mov ebx, hookV
-		inc count;
+		inc count; 向下移动时，count++
 	.endif
 
 	;Step2.PSin送入eax,并写hookPosX
@@ -168,7 +168,7 @@ LoopTraverseItem:
 		invoke calDistance, hookPosX, hookPosY, Items[edi].posX, Items[edi].posY
 		mov ebx, Items[edi].radius
 		.if ( tool5 == 0 && Items[edi].typ == 1);拥有磁铁,金子半径+30
-			add ebx, 30
+			add ebx, 50
 		.endif
 		cmp eax, ebx; 比较大小
 		jb Hit; 距离小于半径，跳转到Hit。相当于break
@@ -330,7 +330,7 @@ timer proc C id:dword
 		invoke IsHit;
 	.endif
 	invoke IsOut;
-	invoke printf, OFFSET szFmt7, hookStat, hookODir, hookDir, hookDeg, hookV, hookPosX, hookPosY
+	;invoke printf, OFFSET szFmt7, hookStat, hookODir, hookDir, hookDeg, hookV, hookPosX, hookPosY
 	invoke Flush; 绘图主调函数
 	invoke IsTimeOut
 	;invoke printf, OFFSET szFmt2, id, timeElapsed; 打印定时器回调函数信息
@@ -355,14 +355,14 @@ IniGameSize:
 
 	; 初始化时间
 IniTime:
-	mov eax, 30;
+	mov eax, 1;
 	mov restTime, eax; 剩余时间30s
 	mov eax, 0
 	mov timeElapsed, 0;  流逝时间
 
 	; 初始化得分
 IniScore:
-	add goalScore, 400; 目标得分在上一关的基础上增加400
+	add goalScore, 5; 目标得分在上一关的基础上增加400
 
 
 	; 初始化矿工

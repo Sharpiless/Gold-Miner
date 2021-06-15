@@ -48,7 +48,7 @@ main proc;
 	mov eax, 0
 	mov curWindow, eax
 	;重置得分
-	mov eax, 0;
+	mov eax, 1000;
 	mov playerScore, eax; 
 	;重置目标得分
 	mov eax, 0
