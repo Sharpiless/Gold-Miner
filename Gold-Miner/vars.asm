@@ -26,7 +26,8 @@ public goalScore
 playerScore DWORD 0; 当前得分
 public playerScore
 
-
+roundNum DWORD 0
+public roundNum
 
 
 ; 矿工

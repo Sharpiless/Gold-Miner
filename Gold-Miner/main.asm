@@ -15,7 +15,7 @@ include include\view.inc
 include include\controller.inc
 printf PROTO C :ptr sbyte, :VARARG
 
-
+extern roundNum:dword
 
 
 
@@ -50,12 +50,15 @@ main proc;
 	mov eax, 0
 	mov curWindow, eax
 	;重置得分
-	mov eax, 1000;
+	mov eax, 0;
 	mov playerScore, eax; 
 	;重置目标得分
 	mov eax, 0
 	mov goalScore, eax
-	;设置鞭炮数量
+	;重置关卡
+	mov eax, 0
+	mov roundNum, eax
+	;重置鞭炮数量
 	mov eax, 0
 	mov fireNum, eax
 	invoke Flush; 绘制欢迎界面

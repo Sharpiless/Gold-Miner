@@ -24,6 +24,7 @@ extern tool5:dword; TODO extern语句放在这就能跑了
 extern tool6:dword
 extern price5:dword
 extern price6:dword
+extern roundNum:dword
 
 
 printf PROTO C :ptr DWORD, :VARARG
@@ -187,11 +188,14 @@ iface_mouseEvent proc C x:dword,y:dword,button:dword,event:dword
 			mov eax, 0
 			mov curWindow, eax
 			;重置得分
-			mov eax, 1000
+			mov eax, 0
 			mov playerScore, eax; 
 			;重置目标得分
 			mov eax, 0
 			mov goalScore, eax
+			;重置关卡
+			mov eax, 0
+			mov roundNum, eax
 			;设置鞭炮数量
 			mov eax, 0
 			mov fireNum, eax

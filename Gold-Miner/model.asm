@@ -24,7 +24,7 @@ extern Items:Item; vars中定义的物体数组
 
 extern tool5:dword; TODO extern语句放在这就能跑了
 extern tool6:dword
-
+extern roundNum:dword
 
 printf PROTO C :ptr DWORD, :VARARG
 calDistance PROTO C :dword, :dword, :dword, :dword  ; 来自StaticLib1.lib，计算两点间距离
@@ -58,7 +58,6 @@ szFmt5 BYTE '断点...', 0ah, 0
 szFmt6 BYTE '待观察寄存器的值=%d', 0ah, 0
 szFmt7 BYTE 'In timer, hoosStat=%d, hookODir=%d, hookDir=%d, hookDeg=%d, hookV=%d, hookPosX=%d, hookPosY=%d', 0ah, 0
 szFmt8 BYTE '随机初始化第%d个物体...posX=%d, posY=%d, radius=%d, typ=%d', 0ah, 0
-
 
 .code
 
@@ -347,8 +346,11 @@ IsTimeOut proc C
 
 		mov eax, goalScore
 		.if playerScore >= eax; 过关
+			;过关
+			inc roundNum
+			;切换到商店界面	
 			mov eax, 2
-			mov curWindow, eax; 切换到商店界面	
+			mov curWindow, eax; 
 			invoke Flush; 绘制商店界面
 			invoke loadSound,addr modelMusicstartstore,addr modelMusicstartstoreP
 			invoke playSound,modelMusicstartstoreP,0
@@ -357,11 +359,14 @@ IsTimeOut proc C
 			mov eax, 0
 			mov curWindow, eax
 			; 重置得分
-			mov eax, 1000;
+			mov eax, 0;
 			mov playerScore, eax; 
 			;重置目标得分
 			mov eax, 0
 			mov goalScore, eax
+			;重置关卡
+			mov eax, 0
+			mov roundNum, eax
 			;设置鞭炮数量
 			mov eax, 0
 			mov fireNum, eax
@@ -413,7 +418,7 @@ IniTime:
 
 	; 初始化得分
 IniScore:
-	add goalScore, 5; 目标得分在上一关的基础上增加400
+	add goalScore, 400; 目标得分在上一关的基础上增加400
 
 
 	; 初始化矿工
@@ -473,22 +478,62 @@ RandLoop:
 	div ebx; 余数0~9放在edx中
 
 	; 设置物体类别
-	.if edx < 2; 0.2概率为石头
-		mov eax, 0
-		mov Items[edi].typ, eax
+	.if roundNum < 2  ;前两关
+		.if edx < 1; 0.1概率为石头
+			mov eax, 0
+			mov Items[edi].typ, eax
+		.else
+			.if edx < 5; 0.4概率为金块
+				mov eax, 1
+				mov Items[edi].typ, eax
+			.elseif edx < 7
+				mov eax, 2; 0.2概率为钻石
+				mov Items[edi].typ, eax
+			.elseif edx < 9
+				mov eax, 3; 0.2概率为福袋
+				mov Items[edi].typ, eax
+			.else 
+				mov eax, 4; 0.1概率为TNT
+				mov Items[edi].typ, eax
+			.endif
+		.endif
+	.elseif roundNum < 4 ;3、4关
+		.if edx < 2; 0.2概率为石头
+			mov eax, 0
+			mov Items[edi].typ, eax
+		.else
+			.if edx < 6; 0.4概率为金块
+				mov eax, 1
+				mov Items[edi].typ, eax
+			.elseif edx < 7
+				mov eax, 2; 0.1概率为钻石
+				mov Items[edi].typ, eax
+			.elseif edx < 8
+				mov eax, 3; 0.1概率为福袋
+				mov Items[edi].typ, eax
+			.else 
+				mov eax, 4; 0.2概率为TNT
+				mov Items[edi].typ, eax
+			.endif
+		.endif
 	.else
-		.if edx < 6; 0.4概率为金块
-			mov eax, 1
+		.if edx < 2; 0.2概率为石头
+			mov eax, 0
 			mov Items[edi].typ, eax
-		.elseif edx < 8
-			mov eax, 2; 0.2概率为钻石
-			mov Items[edi].typ, eax
-		.elseif edx < 9
-			mov eax, 3; 0.1概率为福袋
-			mov Items[edi].typ, eax
-		.else 
-			mov eax, 4; 0.1概率为TNT
-			mov Items[edi].typ, eax
+		.else
+			.if edx < 5; 0.3概率为金块
+				mov eax, 1
+				mov Items[edi].typ, eax
+			.elseif edx < 6
+				mov eax, 2; 0.1概率为钻石
+				mov Items[edi].typ, eax
+			.elseif edx < 7
+				mov eax, 3; 0.1概率为福袋
+				mov Items[edi].typ, eax
+			.else 
+				mov eax, 4; 0.3概率为TNT
+				mov Items[edi].typ, eax
+			.endif
 		.endif
 	.endif
 
