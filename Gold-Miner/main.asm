@@ -17,6 +17,8 @@ printf PROTO C :ptr sbyte, :VARARG
 
 
 
+
+
 .data
 
 winTitle byte "»Æ½ð¿ó¹¤", 0

@@ -9,6 +9,7 @@ extern restTime:dword
 ;ตรทึ
 extern goalScore:dword
 extern playerScore:dword
+
 ;ฟ๓นค
 extern minerPosX:dword
 extern minerPosY:dword

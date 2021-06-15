@@ -25,6 +25,7 @@ extern Items:Item; vars中定义的物体数组
 extern tool5:dword; TODO extern语句放在这就能跑了
 extern tool6:dword
 
+
 printf PROTO C :ptr DWORD, :VARARG
 calDistance PROTO C :dword, :dword, :dword, :dword  ; 来自StaticLib1.lib，计算两点间距离
 calPSin PROTO C :dword, :dword ; 来自StaticLib1.lib，计算PSinθ
@@ -36,12 +37,14 @@ modelMusicstone byte "..\resource\music\stone.mp3", 0
 modelMusicbaganddiamond byte "..\resource\music\baganddiamond.mp3", 0
 modelMusicback byte "..\resource\music\back.mp3", 0
 modelMusicstartstore byte "..\resource\music\startstore.mp3", 0
+modelMusicboomb byte "..\resource\music\boomb.mp3", 0
 
 modelMusicgoldP dd 0
 modelMusicstoneP dd 0
 modelMusicbaganddiamondP dd 0
 modelMusicbackP dd 0
 modelMusicstartstoreP dd 0
+modelMusicboombP dd 0
 
 
 hookODir DWORD ?; 角速度方向。1朝右，0朝左
@@ -154,6 +157,42 @@ FinishMoveHook:
 MoveHook endp
 
 
+fireTNT proc C posX:dword, posY:dword
+	pushad
+	mov edi, 0; 初始化遍历变量
+TraverseForTNT:
+	
+	.if Items[edi].exist == 1
+		invoke calDistance, posX, posY, Items[edi].posX, Items[edi].posY
+		mov ebx, 200; 200是爆炸半径
+		.if eax<ebx; 比较大小
+			; 写exist为0
+			mov eax, 0
+			mov Items[edi].exist, eax
+			; 播放音效
+			invoke loadSound,addr modelMusicboomb,addr modelMusicboombP
+			invoke playSound,modelMusicboombP,0
+			; 若是TNT，递归爆炸
+			.if Items[edi].typ == 4  
+				invoke fireTNT, Items[edi].posX, Items[edi].posY
+			.endif
+		.endif
+	.endif
+
+	add edi, 28; 增加数组下标。注意现在加的是28，一个结构体元素的大小
+	mov eax, itemNum
+	mov ebx, 28;
+	mul ebx;
+	cmp edi, eax; 检查循环是否结束,结束条件：edi==itemNum*28
+	jne TraverseForTNT; 循环未结束，进行下一轮循环
+
+	popad
+	ret
+fireTNT endp
+
+
+
+
 
 ; @brief: 判断钩索是否命中物体。遍历items中所有物体的位置(posX、posY)，判断钩索位置与物体位置的距离是否小于物体半径。
 ; @read: hookPosX，hookPosY，Items
@@ -180,10 +219,24 @@ LoopTraverseItem:
 	mul ebx;
 	cmp edi, eax; 检查循环是否结束,结束条件：edi==itemNum*28
 	jne LoopTraverseItem; 循环未结束，进行下一轮循环
-	jmp NotHit; 循环结束且未命中，跳转到NotHit
+	jmp Finish; 循环结束且未命中，跳转到Finish
 
 Hit:
-	;invoke printf, OFFSET szFmt3, edi, eax, Items[edi].radius; 打印命中信息，eax是距离
+	.if Items[edi].typ == 4;TNT
+		; 写hookDir为1,并且空勾返回
+		mov eax, 1
+		mov hookDir, eax
+		; 写exist为0，TNT直接爆炸
+		mov eax, 0
+		mov Items[edi].exist, eax
+		; 播放音效
+		invoke loadSound,addr modelMusicboomb,addr modelMusicboombP
+		invoke playSound,modelMusicboombP,0
+		; 递归爆炸
+		invoke fireTNT, Items[edi].posX, Items[edi].posY 
+		jmp Finish
+	.endif
+
 	; 写lastHit为命中物体的下标
 	mov eax, edi
 	mov lastHit, eax
@@ -208,10 +261,8 @@ Hit:
 		invoke loadSound,addr modelMusicbaganddiamond,addr modelMusicbaganddiamondP
 		invoke playSound,modelMusicbaganddiamondP,0
 	.endif
-	
 	jmp Finish
-NotHit:
-	;invoke printf, OFFSET szFmt4; 打印未命中信息
+
 
 Finish:
 	popad
@@ -305,8 +356,8 @@ IsTimeOut proc C
 			;设置当前窗口为1
 			mov eax, 0
 			mov curWindow, eax
-			;重置得分
-			mov eax, 0
+			; 重置得分
+			mov eax, 1000;
 			mov playerScore, eax; 
 			;重置目标得分
 			mov eax, 0
@@ -355,7 +406,7 @@ IniGameSize:
 
 	; 初始化时间
 IniTime:
-	mov eax, 1;
+	mov eax, 30;
 	mov restTime, eax; 剩余时间30s
 	mov eax, 0
 	mov timeElapsed, 0;  流逝时间
@@ -422,18 +473,21 @@ RandLoop:
 	div ebx; 余数0~9放在edx中
 
 	; 设置物体类别
-	.if edx < 3; 0.3概率为石头
+	.if edx < 2; 0.2概率为石头
 		mov eax, 0
 		mov Items[edi].typ, eax
 	.else
-		.if edx < 8; 0.5概率为金块
+		.if edx < 6; 0.4概率为金块
 			mov eax, 1
 			mov Items[edi].typ, eax
-		.elseif edx < 9
-			mov eax, 2; 0.1概率为钻石
+		.elseif edx < 8
+			mov eax, 2; 0.2概率为钻石
 			mov Items[edi].typ, eax
-		.else
+		.elseif edx < 9
 			mov eax, 3; 0.1概率为福袋
+			mov Items[edi].typ, eax
+		.else 
+			mov eax, 4; 0.1概率为TNT
 			mov Items[edi].typ, eax
 		.endif
 	.endif
@@ -464,6 +518,12 @@ RandLoop:
 	mov Items[edi].posY, edx
 
 	; 设置物体的半径、重量、价值，需要先判断物体类别
+
+	mov ebx, Items[edi].typ
+	.if ebx == 4; TNT
+		mov eax, 35
+		mov Items[edi].radius, eax
+	.endif
 
 	mov ebx, Items[edi].typ
 	.if ebx == 3; 福袋

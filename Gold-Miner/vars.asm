@@ -26,6 +26,9 @@ public goalScore
 playerScore DWORD 0; 当前得分
 public playerScore
 
+
+
+
 ; 矿工
 minerPosX DWORD ?
 public minerPosX

@@ -25,6 +25,7 @@ extern tool6:dword
 extern price5:dword
 extern price6:dword
 
+
 printf PROTO C :ptr DWORD, :VARARG
 calPSin PROTO C :dword, :dword ; 来自StaticLib1.lib，计算PSinθ
 calPCos PROTO C :dword, :dword ; 来自StaticLib1.lib，计算PCosθ
@@ -174,7 +175,7 @@ iface_mouseEvent proc C x:dword,y:dword,button:dword,event:dword
 
 		invoke is_inside_the_rect,x,y,630,700,30,45; 点击第一个商品，石头收藏书
 		;矩形范围：630，30，？，15
-		.if eax == 1; 点击菜单，回到欢迎界面
+		.if eax == 1; 点击菜单，回到欢迎界面menu
 			;重置tool们
 			mov tool1, 1
 			mov tool2, 1
@@ -186,7 +187,7 @@ iface_mouseEvent proc C x:dword,y:dword,button:dword,event:dword
 			mov eax, 0
 			mov curWindow, eax
 			;重置得分
-			mov eax, 0
+			mov eax, 1000
 			mov playerScore, eax; 
 			;重置目标得分
 			mov eax, 0

@@ -54,6 +54,7 @@ srcxpx byte "..\resource\icon\xpx.jpg", 0 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 srcdiamond byte "..\resource\icon\diamond.jpg", 0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 srcbigstone byte "..\resource\icon\bigstone.jpg", 0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 srcbag byte "..\resource\icon\bag.jpg", 0
+srctnt byte "..\resource\icon\tnt.jpg", 0
 srcmagnet byte "..\resource\icon\magnet.jpg", 0; 展示在商店中
 srcehook byte "..\resource\icon\ehook.jpg", 0
 srcmagnet1 byte "..\resource\icon\magnet1.jpg", 0; 展示在游戏中
@@ -74,6 +75,7 @@ imgxpx ACL_Image <> ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 imgdiamond ACL_Image <>;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 imgbigstone ACL_Image <>;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 imgbag ACL_Image <>
+imgtnt ACL_Image <>
 imgmagnet ACL_Image <>
 imgehook ACL_Image <>
 imgmagnet1 ACL_Image <>
@@ -148,6 +150,9 @@ DrawItem proc C x: dword, y: dword, r: dword, t: dword		;只能在启动了paint时调用
 	.elseif eax==3 ; 幸运袋
 		invoke loadImage, offset srcbag, offset imgbag;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		invoke putImageScale, offset imgbag, y, x, r, r;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	.elseif eax == 4; TNT
+		invoke loadImage, offset srctnt, offset imgtnt;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+		invoke putImageScale, offset imgtnt, y, x, r, r;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	.endif
 	pop eax
 	ret
