@@ -1,9 +1,0 @@
-b
---- RECORDSEPARATOR ---
-o
---- RECORDSEPARATOR ---
-n
---- RECORDSEPARATOR ---
-u
---- RECORDSEPARATOR ---
-s
