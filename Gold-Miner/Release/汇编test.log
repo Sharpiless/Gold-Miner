@@ -1,112 +1,20 @@
 ﻿D:\Microsoft Visual Studio\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(491,5): warning MSB8028: 中间目录(Release\)包含从另一个项目(汇编test.vcxproj)共享的文件。   这会导致错误的清除和重新生成行为。
+  Assembling controller.asm...
+controller.asm(304): warning A6004: procedure argument or local not referenced : button
   Assembling main.asm...
   Assembling model.asm...
-model.asm(209): warning A6004: procedure argument or local not referenced : id
-  Assembling test.asm...
+model.asm(394): warning A6004: procedure argument or local not referenced : id
   Assembling vars.asm...
   Assembling view.asm...
 view.obj : warning LNK4258: 指令“/ENTRY:Flush”与开关“/ENTRY:main@0”不兼容；已忽略
 StaticLib1.lib(StaticLib1.obj) : warning LNK4075: 忽略“/EDITANDCONTINUE”(由于“/OPT:ICF”规范)
   正在生成代码
-  Previous IPDB not found, fall back to full compilation.
-C:\Users\rainielove\source\repos\acllib\acllib\acllib.c(145): warning C4715: “init_first”: 不是所有的控件路径都返回值
-  All 21 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  0 of 29 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
   已完成代码的生成
-controller.obj : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-main.obj : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-model.obj : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-test.obj : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
 view.obj : warning LNK4258: 指令“/ENTRY:Flush”与开关“/ENTRY:main@0”不兼容；已忽略
-view.obj : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-msvcrt.lib(msvcrt.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-msvcrt.lib(msvcrt.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-winmm.lib(winmm.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-msimg32.lib(msimg32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-ole32.lib(ole32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-oleaut32.lib(oleaut32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
-D:\VisualStudioProjects\Gold-Miner\Release\GAME.exe : fatal error LNK1281: 无法生成 SAFESEH 映像。
+acllib.lib(acllib.obj) : warning LNK4099: 未找到 PDB“acllib.pdb”(使用“acllib.lib(acllib.obj)”或在“D:\VisualStudioProjects\Gold-Miner\Release\acllib.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lrfLib.lib(myLib.obj) : warning LNK4099: 未找到 PDB“myLib.pdb”(使用“lrfLib.lib(myLib.obj)”或在“D:\VisualStudioProjects\Gold-Miner\Release\myLib.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+lrfLib.lib(pch.obj) : warning LNK4099: 未找到 PDB“myLib.pdb”(使用“lrfLib.lib(pch.obj)”或在“D:\VisualStudioProjects\Gold-Miner\Release\myLib.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+  汇编test.vcxproj -> D:\VisualStudioProjects\Gold-Miner\Release\GAME.exe

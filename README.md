@@ -1,10 +1,22 @@
 # 汇编小游戏——黄金矿工
 
+## 小组成员及分工
+
+叶语霄：负责定义全局变量和项目架构
+
+袁沛文：编写view模块
+
+李子昂：编写model模块
+
+梁瑛平：编写controller模块
+
 ## 玩家使用指南
 
 项目地址：https://github.com/Insomnia-y/Gold-Miner
 
-编译前，请先修改链接器中的附加库目录和属性页最下方MS Assembly中的IncludePath。分别添加masm32的目录和项目的目录；
+若要开始游戏，请运行./Release/GAME.exe。
+
+若上述方法无法开始游戏，可以在visual studio中切换到Debug模式下手动编译运行。编译前请先修改链接器中的附加库目录和属性页最下方MS Assembly中的IncludePath。分别添加masm32的目录和项目的目录。
 
 ### 1.项目结构
 
@@ -12,16 +24,32 @@
 
 ```
 Gold-Miner
+├─Release
+│  ├─GAME.exe
 ├─Gold-Miner
 │  ├─include
 │  ├─main.asm
+│  ├─vars.asm
+│  ├─controller.asm
+│  ├─model.asm
+│  ├─view.asm
 ├─lib
 └─resource
     ├─icon
     └─music
 ```
 
+./Release/GAME.exe：生成的可执行文件，点击即可直接开始游戏
+
 ./Gold-Miner/main.asm：程序入口，包含main子函数，即程序开始运行的地方。
+
+./Gold-Miner/vars.asm：定义的全局变量
+
+./Gold-Miner/controller.asm：控制器模块，负责捕获用户的鼠标和键盘事件
+
+./Gold-Miner/model.asm：以不同方式响应用户的不同事件，根据游戏逻辑调用函数，修改全局变量
+
+./Gold-Miner/view.asm：根据当前的全局变量，绘制游戏界面
 
 ./Gold-Miner/include：包含所有.inc文件
 
@@ -134,8 +162,6 @@ Gold-Miner
 
 #### 钩索
 
-A：
-
 当前钩索状态`hookStat`：DD，当前钩索是否被释放。1时释放，表现为下一次触发时间片时钩索位置变化，钩索角度不变；0时不释放，表现为下一次触发时间片时钩索角度变化，钩索位置不变。
 
 当前钩索角度移动方向`hookODir`：DD，**仅当hookStat为false时有意义。**为0时向右转，为1时向左转。
@@ -146,7 +172,7 @@ A：
 
 钩索线速度`hookV`，DD，有一基础值(下放和未命中回收时)，命中回收时依赖于抓到的物体类型。
 
-B：
+---
 
 钩索角度`hookDeg`：DD，取值范围为180~360度。
 
@@ -161,21 +187,6 @@ B：
 | 1        | 0            | 向下移动 |
 | 1        | 1            | 向上移动 |
 
-#### 商店
-
-tool1 dd 1; 石头收藏书
-public tool1
-tool2 dd 1; 鞭炮
-public tool2
-tool3 dd 1; 神水
-public tool3
-tool4 dd 1; 幸运草
-public tool4
-tool5 dd 1; 磁铁
-public tool5
-tool6 dd 1; 电动勾
-public tool6
-
 ### 3.控制器
 
 #### 用户事件回调函数：释放钩索
@@ -188,13 +199,9 @@ public tool6
 
 触发定时器时，依次调用以下函数。
 
-根据A写B
-
 #### 函数：钩索移动
 
 根据`hookStat`，计算并更新`hookPos`或`hookDeg`。
-
-根据B写A
 
 #### 函数：判断钩索是否命中物体
 

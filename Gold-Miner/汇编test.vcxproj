@@ -95,6 +95,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>D:\masm32\lib;D:\VisualStudioProjects\Gold-Miner\lib</AdditionalLibraryDirectories>
+      <AdditionalOptions>/SAFESEH:NO %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <MASM>
       <IncludePaths>D:\masm32\include;D:\VisualStudioProjects\Gold-Miner\Gold-Miner\include</IncludePaths>
@@ -115,6 +116,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>D:\masm32\lib;D:\VisualStudioProjects\Gold-Miner\lib</AdditionalLibraryDirectories>
+      <AdditionalOptions>/SAFESEH:NO %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <MASM>
       <IncludePaths>D:\masm32\include;D:\VisualStudioProjects\Gold-Miner\Gold-Miner\include</IncludePaths>
